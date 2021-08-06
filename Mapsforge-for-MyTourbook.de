@@ -1,0 +1,146 @@
+# Script's German localized text strings
+
+# Rules:
+# message label must exactly match message label in script
+# followed by localized text string
+
+# Documentation:
+# https://www.tcl-lang.org/man/tcl/TclCmd/msgcat.htm
+
+# ISO 639-1 code for German language: de
+set iso_639_1 "de"
+
+::msgcat::mcmset $iso_639_1 {	# Begin of translations
+
+i00	"Fehler beim Lesen der Benutzereinstellungen\nvon Datei '%s'"
+i01	"Erforderliche Benutzereinstellungen fehlen,\nDatei '%s' nicht gefunden"
+
+l01	"Mapsforge für MyTourbook"
+
+l11	"Bevorzugte Mapsforge-Kartensprache:\n(2 Kleinbuchstaben ISO 639-1 Code)"
+l11t	"Unterstützte Kartensprachen\nsiehe Ausgabe-Konsole"
+l12	"Mapsforge-Renderer"
+l13	"Mapsforge-Kartenordner"
+l14	"Mapsforge-Karte(n)"
+l15	"Mapsforge-Weltkarte hinzufügen"
+l16	"Mapsforge-Themenordner"
+l17	"Mapsforge-Thema"
+l18	"Themenstil"
+
+e01	"%s '%s'\nmit Prozess-ID %d läuft bereits"
+e01q	"Prozess durch 'kill' beenden\nund neu starten?"
+e02	"Betriebssytem %s nicht unterstützt"
+e03	"Befehl '%s' in\nVariable '%s' ist nicht ausführbar"
+e04	"Ordner '%s' in\nVariable '%s' existiert nicht"
+e05	"Offline-Verzeichnis (Kachelspeicher) '%s' nicht gültig"
+e11	"Keine Mapsforge-Karte gefunden"
+
+c01	"Overlays zum Stil auswählen"
+c02	"Schummerung konfigurieren"
+c02t	"Schummerung muss im\nMapsforge-Thema aktiviert sein!"
+c03	"Skalierung & Farben"
+c04	"Server konfigurieren"
+
+s01	"Skalierbare Kartenelemente skalieren"
+s02	"Alle Elemente"
+s03	"Beschriftungen"
+s04	"Symbole"
+
+s06	"Farbe nachbearbeiten"
+s07	"Gammakorrektur"
+s08	"Kontrastspreizung"
+
+x01	"Server-Information"
+x02	"Version Java-Runtime"
+x03	"Version Mapsforge Tile Server"
+x04	"Java-Archiv des Servers"
+
+x11	"Server-Konfiguration"
+x12	"Rendering-Engine"
+x13	"Netzwerk-Interface(s)"
+x14	"TCP-Port"
+x15	"Größe der TCP-Accept-Queue"
+x16	"Minimum gleichzeitiger Threads"
+x17	"Maximum gleichzeitiger Threads"
+
+b01	"Starten"
+b01t	"Hinweis:\nKarte 'Mapsforge' in MyTourbook aktivieren.\nNach Änderung von Einstellungen\ndiesen Knopf 'Starten' erneut drücken,\ndann Karte in MyTourbook rechtsklicken und\n'Fehlerhafte Karten Bilder nochmals laden'!"
+b02	"Beenden"
+b02t	"Beenden und MyTourbook schließen"
+
+e41	"Keine Mapsforge-Karte(n) ausgewählt"
+e45	"DEM-Ordner fehlt oder nicht gültig"
+
+m51	"Prozess %d (%s) gestartet"
+m52	"Prozess %d (%s) beendet"
+m53	"Prozess %d (%s) durch 'kill' beendet"
+m54	"Starte %s"
+m55	"Unerwartetes Ende von Mapsforge Tile Server"
+m56	"Suche Desktop-Fenster von Prozess %d (%s)"
+m57	"Keine Desktop-Fenster von Prozess %d (%s) gefunden"
+m58	"Sende Window-Manager-Nachricht 'Schließen' an Prozess %d (%s)"
+
+c80	"Schummerung einschalten"
+
+l81	"DEM-Ordner (Digital Elevation Model)"
+l81t	"hgt-Dateien mit Höhendaten"
+l82	"DEM-Ordner auswählen"
+l83	"Algorithmus"
+l84	"Linearität"
+l85	"Skalierung"
+l86	"Höhenwinkel der Lichtquelle"
+l87	"Skalierung der Grauwertgröße"
+
+b91	"Alle"
+b92	"Reset"
+b92t	"Zurücksetzen auf\nDefault-Werte"
+
+l99	"Ausgabe-Konsole"
+c99	"Ausgabe-Konsole anzeigen"
+m99	"Ausgabe-Konsole kann jetzt geschlossen werden!"
+
+};	# Do not remove: end of translations
+	# Do not remove: end of file (Ctrl+Z)
+
+# -- Beschreibung der Skript-Variablen ----------------------------------------
+#
+# ini_folder
+#   Ordner zum Sichern/Wiederherstellen der Einstellungen
+# mtb_cmd
+#   Befehl um MyTourbook von der Befehlszeile aufzurufen
+#   Entweder vollständiger Pfad der ausführbaren MyTourbook-Datei (.exe)
+#   oder Name der ausführbaren MyTourbook-Datei, falls über Suchpfad gefunden
+# mtb_args
+#   Weitere optionale MyTourbook-Argumente
+# tiles_folder
+#   Ordner "<Verzeichnis>/<Offline-Verzeichnis>" des
+#   Mapsforge-Kachelspeichers von MyTourbook
+#   Finde Name "<Offline-Verzeichnis>" des Ordners in MyTourbook über
+#     "Werkzeuge -> Einstellungen -> 2D Karte -> Kartenanbieter ->
+#     <Benutzerdefinierte Mapsforge-Karte> -> Offline-Verzeichnis"
+#   Finde Pfadname "<Verzeichnis>" des Ordners in MyTourbook über
+#     "Werkzeuge -> Einstellungen -> 2D Karte -> Offline Karte ->
+#     Offline Informationen -> Verzeichnis"
+#   MyTourbook puffert Mapsforge-Kacheln in diesem Ordner
+#   Ordner wird nach Änderung von Mapsforge-Karte(n) oder Thema geleert
+# maps_folder
+#   Ordner wird rekursiv nach Mapsforge-Karten mit Endung .map durchsucht
+# themes_folder
+#   Ordner wird rekursiv nach Mapsforge-Themen mit Endung .xml durchsucht
+# java_cmd
+#   Befehl um Java von der Befehlszeile aufzurufen
+#   Entweder vollständiger Pfad des ausführbaren Java-Programms (.exe)
+#   oder Name des ausführbaren Java-Programms, falls über Suchpfad gefunden
+# java_args
+#   Weitere optionale Java-Argumente
+# server_jar
+#   Vollständiger Pfad des lokalen Mapsforge Tile Servers Java-Archiv (.jar)
+#   mapsforgesrv-fatjar.jar ... für Java version 11 oder höher
+# tcp_port
+#   TCP-Port für Kommunikation zwischen Mapsforge Tile Server und MyTourbook
+#   (49152 <= Port <= 65535)
+# language
+#   Bevorzugte Mapsforge-Kartensprache (2 Kleinbuchstaben ISO 639-1 Code)
+#   (z.B. "en", "fr", "de" etc. oder "" für Mapsforge-Defaultsprache)
+#
+# -- Ende der Beschreibung ----------------------------------------------------
