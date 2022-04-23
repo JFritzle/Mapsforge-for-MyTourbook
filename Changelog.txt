@@ -1,0 +1,12 @@
+2022-04-23
+
+- Get MyTourbook's tile cache folder from MyTourbook's configuration.
+  Script variables "tiles_folder" from ini file is no longer required.
+- Script variable "ip_address" from ini file is no longer required.
+- Force MyTourbook to use Java executable defined by script variable "java_cmd" in ini file.
+  This allows for specifying a Java runtime comptible with MyTourbook.
+- Add optional hillshading as alpha-transparent overlay ("Hillshading as map").
+- Supply custom map providers and map profiles for hillshading as alpha-transparent overlay.
+- Enhance console output and make it more readable.
+- Drop support for tile server versions before version 0.17.1.
+

@@ -28,16 +28,15 @@ l17	"Mapsforge-Thema"
 l18	"Themenstil"
 
 e01	"%s '%s'\nmit Prozess-ID %d läuft bereits"
-e01q	"Prozess durch 'kill' beenden\nund neu starten?"
-e02	"Betriebssytem %s nicht unterstützt"
-e03	"Befehl '%s' in\nVariable '%s' ist nicht ausführbar"
-e04	"Ordner '%s' in\nVariable '%s' existiert nicht"
-e05	"Offline-Verzeichnis (Kachelspeicher) '%s' nicht gültig"
+e02	"Prozess durch 'kill' beenden\nund neu starten?"
+e03	"Betriebssytem %s nicht unterstützt"
+e04	"Befehl '%s' in\nVariable '%s' ist nicht ausführbar"
+e05	"Ordner '%s' in\nVariable '%s' existiert nicht"
+e07	"Mapsforge Tile Server Version ist '%s'.\nMindestens Version '%s' ist erforderlich!"
 e11	"Keine Mapsforge-Karte gefunden"
 
 c01	"Overlays zum Stil auswählen"
 c02	"Schummerung konfigurieren"
-c02t	"Schummerung muss im\nMapsforge-Thema aktiviert sein!"
 c03	"Skalierung & Farben"
 c04	"Server konfigurieren"
 
@@ -58,15 +57,15 @@ x04	"Java-Archiv des Servers"
 x11	"Server-Konfiguration"
 x12	"Rendering-Engine"
 x13	"Netzwerk-Interface(s)"
-x14	"TCP-Port"
-x15	"Größe der TCP-Accept-Queue"
-x16	"Minimum gleichzeitiger Threads"
-x17	"Maximum gleichzeitiger Threads"
+x15	"TCP-Port"
+x16	"Größe der TCP-Accept-Queue"
+x17	"Minimum gleichzeitiger Threads"
+x18	"Maximum gleichzeitiger Threads"
 
 b01	"Starten"
-b01t	"Hinweis:\nKarte 'Mapsforge' in MyTourbook aktivieren.\nNach Änderung von Einstellungen\ndiesen Knopf 'Starten' erneut drücken,\ndann Karte in MyTourbook rechtsklicken und\n'Fehlerhafte Karten Bilder nochmals laden'!"
+b01t	"2D-Karte 'MapsforgeMap' in MyTourbook\naktivieren. Nach Änderung von Einstellungen\ndiesen Knopf 'Starten' erneut drücken,\ndann 2D-Karte in MyTourbook rechtsklicken und\n'Fehlerhafte Karten Bilder nochmals laden'!"
 b02	"Beenden"
-b02t	"Beenden und MyTourbook schließen"
+b02t	"MyTourbook schließen und beenden"
 
 e41	"Keine Mapsforge-Karte(n) ausgewählt"
 e45	"DEM-Ordner fehlt oder nicht gültig"
@@ -75,12 +74,18 @@ m51	"Prozess %d (%s) gestartet"
 m52	"Prozess %d (%s) beendet"
 m53	"Prozess %d (%s) durch 'kill' beendet"
 m54	"Starte %s"
-m55	"Unerwartetes Ende von Mapsforge Tile Server"
+m55	"Unerwartetes Ende von %s"
 m56	"Suche Desktop-Fenster von Prozess %d (%s)"
 m57	"Keine Desktop-Fenster von Prozess %d (%s) gefunden"
 m58	"Sende Window-Manager-Nachricht 'Schließen' an Prozess %d (%s)"
+m59	"%s nicht gestartet.\nTCP-Port '%s' bereits in Benutzung"
+m60	"Lösche MyTourbook-Kachelspeicher '%s'"
 
 c80	"Schummerung einschalten"
+c81	"Schummerung auf Karte"
+c81t	"Schummerung muss im\nMapsforge-Thema aktiviert sein!"
+c82	"Schummerung als Karte"
+c82t	"2D-Karte 'Mapsforge Hillshading'\nin MyTourbook aktivieren"
 
 l81	"DEM-Ordner (Digital Elevation Model)"
 l81t	"hgt-Dateien mit Höhendaten"
@@ -92,6 +97,7 @@ l86	"Höhenwinkel der Lichtquelle"
 l87	"Skalierung der Grauwertgröße"
 
 b91	"Alle"
+b91t	"Alle auswählen"
 b92	"Reset"
 b92t	"Zurücksetzen auf\nDefault-Werte"
 
@@ -112,17 +118,6 @@ m99	"Ausgabe-Konsole kann jetzt geschlossen werden!"
 #   oder Name der ausführbaren MyTourbook-Datei, falls über Suchpfad gefunden
 # mtb_args
 #   Weitere optionale MyTourbook-Argumente
-# tiles_folder
-#   Ordner "<Verzeichnis>/<Offline-Verzeichnis>" des
-#   Mapsforge-Kachelspeichers von MyTourbook
-#   Finde Name "<Offline-Verzeichnis>" des Ordners in MyTourbook über
-#     "Werkzeuge -> Einstellungen -> 2D Karte -> Kartenanbieter ->
-#     <Benutzerdefinierte Mapsforge-Karte> -> Offline-Verzeichnis"
-#   Finde Pfadname "<Verzeichnis>" des Ordners in MyTourbook über
-#     "Werkzeuge -> Einstellungen -> 2D Karte -> Offline Karte ->
-#     Offline Informationen -> Verzeichnis"
-#   MyTourbook puffert Mapsforge-Kacheln in diesem Ordner
-#   Ordner wird nach Änderung von Mapsforge-Karte(n) oder Thema geleert
 # maps_folder
 #   Ordner wird rekursiv nach Mapsforge-Karten mit Endung .map durchsucht
 # themes_folder
@@ -138,9 +133,13 @@ m99	"Ausgabe-Konsole kann jetzt geschlossen werden!"
 #   mapsforgesrv-fatjar.jar ... für Java version 11 oder höher
 # tcp_port
 #   TCP-Port für Kommunikation zwischen Mapsforge Tile Server und MyTourbook
-#   (49152 <= Port <= 65535)
+#   (1024 <= Port <= 65535)
 # language
 #   Bevorzugte Mapsforge-Kartensprache (2 Kleinbuchstaben ISO 639-1 Code)
 #   (z.B. "en", "fr", "de" etc. oder "" für Mapsforge-Defaultsprache)
+# interface
+#   Netzwerk-Interface des Mapsforge Tile Servers für eingehende Anfragen
+#   "localhost" ... Höre nur auf IPv4-Loopback-Interface & Adresse 127.0.0.1
+#   "all"       ... Höre auf alle Netwerk-Interfaces
 #
 # -- Ende der Beschreibung ----------------------------------------------------
