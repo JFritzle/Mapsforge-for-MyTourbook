@@ -1,3 +1,9 @@
+2022-05-19
+
+- Avoid script aborting when java path by ini file variable "java_cmd" contains spaces
+- Start MyTourbook before optionally starting Mapsforge hillshading overlay server
+  to speed up the launch of MyTourbook application
+
 2022-04-23
 
 - Get MyTourbook's tile cache folder from MyTourbook's configuration.
