@@ -1652,7 +1652,7 @@ proc clean_mapsforge {} {
       }
       set folder $array(OfflineFolder)
       array unset array
-      regexp {http://([^:]+):([0-9]+)} $url "" host port
+      if {![regexp {https?://([^:]+):([0-9]+)} $url "" host port]} {continue}
       # Does url port number match server port number?
       if {$port != $::tcp_port_srv && $port != $::tcp_port_ovl} {continue}
       # Get url host's IP address(es)
