@@ -1,3 +1,7 @@
+2022-05-31
+
+- Avoid script aborting when map provider contains url starting with https://
+
 2022-05-19
 
 - Avoid script aborting when java path by ini file variable "java_cmd" contains spaces
