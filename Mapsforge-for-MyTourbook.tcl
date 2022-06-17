@@ -355,6 +355,10 @@ foreach item {mtb_cmd java_cmd} {
   set value [set $item]
   if {[auto_execok $value] == ""} {error_message [mc e04 $value $item] exit}
 }
+foreach item {server_jar} {
+  set value [set $item]
+  if {![file isfile $value]} {error_message [mc e05 $value $item] exit}
+}
 foreach item {maps_folder themes_folder} {
   set value [set $item]
   if {![file isdirectory $value]} {error_message [mc e05 $value $item] exit}
@@ -602,7 +606,7 @@ proc show_hide_console {} {
       wm deiconify .console
       wm geometry .console +$x+$y
     }
-    if {[winfo ismapped .]} {raise . .console}	
+    if {[winfo ismapped .]} {raise . .console}
   } else {
     wm withdraw .console
   }
@@ -819,8 +823,9 @@ proc validate_float_minmax {widget} {
   if {[regexp {^(\d+\.?\d*|\d*\.?\d+)$} $value]} {
     set valid 1
     lassign [set ::$widget.minmax] min max
-    if {$min != "" && [expr $value < $min]} {set valid 0}
-    if {$max != "" && [expr $value > $max]} {set valid 0}
+    set test [regsub {([+-]?)0*([0-9]+.*)} $value {\1\2}]
+    if {$min != "" && [expr $test < $min]} {set valid 0}
+    if {$max != "" && [expr $test > $max]} {set valid 0}
   } else {
     set valid 0
   }
@@ -851,7 +856,7 @@ proc save_shading_settings {} {
 uplevel #0 {
   set fd [open "$ini_folder/hillshading.ini" w]
   fconfigure $fd -buffering full
-  foreach name {shading.onoff shading.layer shading.algorithm \
+  foreach name {shading.onoff shading.algorithm \
 	shading.simple.linearity shading.simple.scale \
 	shading.diffuselight.angle shading.magnitude dem.folder} {
     puts $fd "$name=[set $name]"
@@ -1100,8 +1105,9 @@ proc validate_number_minmax {widget} {
   if {[regexp {^(\d+)$} $value]} {
     set valid 1
     lassign [set ::$widget.minmax] min max
-    if {$min != "" && [expr $value < $min]} {set valid 0}
-    if {$max != "" && [expr $value > $max]} {set valid 0}
+    set test [regsub {([+-]?)0*([0-9]+.*)} $value {\1\2}]
+    if {$min != "" && [expr $test < $min]} {set valid 0}
+    if {$max != "" && [expr $test > $max]} {set valid 0}
   } else {
     set valid 0
   }
@@ -1982,7 +1988,7 @@ proc srv_start {srv} {
   set url "http://127.0.0.1:${port}/0/0/0.png"
   if {$::server_version < 1703} {append url "?"}
   while {[process_running $srv]} {
-    if {[catch "::http::geturl $url" token]} {after 10; continue}
+    if {[catch {::http::geturl $url} token]} {after 10; continue}
     set size [::http::size $token]
     ::http::cleanup $token
     if {$size} {break}
@@ -1999,8 +2005,9 @@ proc mtb_start {} {
 
   lappend command $::mtb_cmd
   if {[info exists ::mtb_args]} {lappend command {*}$::mtb_args}
-
-  puti "[mc m54 "MyTourbook \[MTB\]"] ..."
+  
+  set name "MyTourbook \[MTB\]"
+  puti "[mc m54 $name] ..."
   puts "[join [lmap item $command {regsub {^(.* +.*)$} $item {"\1"}}]]"
 
   process_start $command mtb

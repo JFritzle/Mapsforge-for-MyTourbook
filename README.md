@@ -48,7 +48,7 @@ Windows: Copy downloaded jar file(s) into Mapsforge tile server’s installation
 Linux: Copy downloaded jar file(s) into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 
 5.	Tcl/Tk scripting language version 8.6 or higher binaries  
-Windows: Download and install latest stable version of Tcl/Tk. See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended distribution is [teclab’s tcltk](https://github.com/teclab-at/tcltk/tree/tcl86/releases) repository. First select most recent installation file _tcltk86-8.6.x.y.tcl86.Win10.x86_64.tgz_, then press _Download_ button. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
+Windows: Download and install latest stable version of Tcl/Tk. See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended distribution is [teclab’s tcltk](https://github.com/teclab-at/tcltk/releases) repository. First select most recent installation file _tcltk86-8.6.x.y.tcl86.Win10.x86_64.tgz_, then press _Download_ button. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
 Linux: Install packages _tcl, tcllib, tk_ and _tklib_ using Linux package manager. Package _tklib_ is required for tooltips. (Ubuntu: _apt install tcl tcllib tk tklib_)
 
 6.	Mapsforge maps  
@@ -113,6 +113,9 @@ Custom map provider _MapsforgeHillshading_ can also be used in other map profile
 
 ![MapProfile](https://user-images.githubusercontent.com/62614244/164914276-bd081152-19f7-4030-90c1-104db92b32d6.jpg)
 
+Note:  
+Zoom levels shown in _Map Profile Configuration_ are one higher than zoom levels internally used by query to the Mapsforge tile server.
+
 ### Example
 
 Screenshot of MyTourbook showing Heidelberg (Germany), comparing _2D Tour Map_ and _2.5D Tour Map_, where _2D Tour Map_ using
@@ -131,5 +134,6 @@ Screenshot of MyTourbook showing Heidelberg (Germany), comparing _2D Tour Map_ a
 * Built-in world map  
 Since the built-in [Mapsforge world map](https://download.mapsforge.org/maps/world/world.map) only shows the coastline, it only serves as a rough overview. Due to map's low resolution, coastlines show inaccurate at high resolution. Because the Mapsforge renderer prefers land on the world map to sea on the selected detailed local map, it may be advisable to disable the built-in world map when rendering coastal regions at high resolution.
 * Hillshading  
-  * When selecting "Hillshading on map", Mapsforge's algorithm renders map and hillshading in one single step. Flat area gets a medium shade of gray, while slopes get a darker or a brighter shade of gray depending on the angle of incidence of light. Thus map has a shade of gray everywhere.  
-  * When selecting "Hillshading as map", Mapsforge's algorithm renders map and hillshading in two steps. Post-processing in step two, gray value of flat area gets mapped to full transparency, darker gray values get mapped to transparency levels of black, brighter gray values get mapped to transparency levels of white. Hillshading map as alpha-transparent overlay from step two finally gets composed with map from step one. Thus the flatter the area, the more the original colors of the map shine through. [OpenTopoMap](https://opentopomap.org) uses this same hillshading technique.  
+  * When selecting "Hillshading on map", map and hillshading are rendered  into one single map. Flat area gets a medium shade of gray, while slopes get a darker or a brighter shade of gray depending on the angle of incidence of light. Thus map has a shade of gray everywhere.  
+  * When selecting "Hillshading as map", map and hillshading are rendered as two separate maps. Post-processing hillshading, gray value of flat area gets mapped to full transparency, darker gray values get mapped to transparency levels of black, brighter gray values get mapped to transparency levels of white. Thus the flatter the area, the more the original colors of the map shine through. Finally, hillshading can be used as an alpha-transparent overlay for any map.  
+[OpenTopoMap](https://opentopomap.org) uses this same hillshading technique.  
