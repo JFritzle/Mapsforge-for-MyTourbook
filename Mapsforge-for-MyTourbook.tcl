@@ -20,7 +20,7 @@ if {[string first tclsh $shell] != -1} {
   exit 0
 }
 
-set script [info script]
+set script [file normalize [info script]]
 set cwd [pwd]
 encoding system utf-8
 
@@ -47,7 +47,7 @@ interp alias {} ::tooltip {} ::tooltip::tooltip
 set locale [regsub {(.*)[-_]+(.*)} [::msgcat::mclocale] {\1}]
 if {$locale == "c"} {set locale "en"}
 
-set prefix [file normalize [file rootname $script]]
+set prefix [file rootname $script]
 
 set list {}
 lappend list $locale en
@@ -78,7 +78,7 @@ if {![info exists locale]} {
 # Read user settings from file
 # Filename = script's filename where file extension "tcl" is replaced by "ini"
 
-set file [file normalize [file rootname $script]].ini
+set file [file rootname $script].ini
 
 if {[file exist $file]} {
   if {[catch {source $file} result]} {
@@ -92,9 +92,36 @@ if {[file exist $file]} {
   exit
 }
 
+# Try to replace settings file's relative paths by absolute paths,
+# but preserve commands if resolved by search path
+
+# - commands
+set cmds {java_cmd mtb_cmd}
+# - commands + folders + files
+set list [concat $cmds ini_folder maps_folder themes_folder server_jar]
+
+set drive [regsub {((^.:)|(^//[^/]*)||(?:))(?:.*$)} $cwd {\1}]
+if {$tcl_platform(os) == "Windows NT"}	{cd $env(SystemDrive)/}
+if {$tcl_platform(os) == "Linux"}	{cd /}
+
+foreach item $list {
+  if {![info exists $item]} {continue}
+  set value [set $item]
+  if {$value == ""} {continue}
+  if {[lsearch -exact $cmds $item] != -1 && \
+      [auto_execok $value] != ""} {continue}
+  switch [file pathtype $value] {
+    absolute		{set $item [file normalize $value]}
+    relative		{set $item [file normalize $cwd/$value]}
+    volumerelative	{set $item [file normalize $drive/$value]}
+  }
+}
+
+cd $cwd
+
 # Restore saved settings from folder ini_folder
 
-if {![info exists ini_folder]} {set ini_folder "~/.Mapsforge"}
+if {![info exists ini_folder]} {set ini_folder [file normalize ~/.Mapsforge]}
 file mkdir $ini_folder
 
 set maps.selection {}
@@ -368,9 +395,7 @@ foreach item {maps_folder themes_folder} {
 
 set java_version 0
 set java_string "unknown"
-set command {}
-lappend command $java_cmd
-lappend command -version
+set command [list $java_cmd -version]
 if {$tcl_platform(os) == "Windows NT"} {
   set rc [catch {open "| $command 2>@1" r} fd]
 } elseif {$tcl_platform(os) == "Linux"} {
@@ -404,23 +429,22 @@ if {$tcl_platform(os) == "Windows NT"} {
 
 set server_version 0
 set server_string "unknown"
-set command {}
-lappend command $java_cmd
-lappend command -jar [file normalize $server_jar] -h
+set command [list $java_cmd -jar $server_jar -h]
 set rc [catch {open "| $command" r} fd]
 if {$rc} {error_message "$fd" exit}
 fconfigure $fd -buffering line
 while {[gets $fd line] != -1} {
-  if {[regsub {^.* version: ((?:[0-9]+\.){2}(?:[0-9]+){1}).*$} $line {\1} data] > 0} {
-    set server_string $data
-    foreach item [split $data .] {set server_version [expr 100*$server_version+$item]}
-    break
-  }
+  if {![regsub {^.* version: ((?:[0-9]+\.){2}(?:[0-9]+){1}).*$} $line \
+	{\1} data]} {continue}
+  set server_string $data
+  foreach item [split $data .] \
+	{set server_version [expr 100*$server_version+$item]}
+  break
 }
 catch "close $fd"
 
-if {$server_version < 1701 } \
-	{error_message [mc e07 $server_string 0.17.1] exit}
+if {$server_version < 1704 } \
+	{error_message [mc e07 $server_string 0.17.4] exit}
 
 # Recursively find files procedure
 
@@ -524,7 +548,7 @@ if {[llength $selection] > 0} {.maps_values see [lindex $selection 0]}
 # Append Mapsforge world map
 
 checkbutton .maps_world -text [mc l15] -variable maps.world
-if {$server_version >= 1704} {pack .maps_world -expand 1 -fill x}
+pack .maps_world -expand 1 -fill x
 
 # Mapsforge theme selection
 
@@ -717,18 +741,11 @@ radiobutton .shading.asmap -text [mc c82] \
 	-variable shading.layer -value asmap
 tooltip .shading.asmap [mc c82t]
 pack .shading.onmap .shading.asmap -anchor w
-if {$server_version < 1702} {
-  .shading.asmap configure -state disabled
-  set shading.layer "onmap"
-}
 
 # Choose DEM folder with HGT files
 
-if {[file isdirectory ${dem.folder}]} {
-  set dem.folder [file normalize ${dem.folder}]
-} else {
-  set dem.folder ""
-}
+if {![file isdirectory ${dem.folder}]} {set dem.folder ""}
+
 labelframe .shading.dem_folder -labelanchor nw -text [mc l81]:
 tooltip .shading.dem_folder [mc l81t]
 pack .shading.dem_folder -fill x -expand 1 -pady 1
@@ -1041,11 +1058,9 @@ entry .server.port_ovl_value -textvariable tcp.port_ovl \
 	-width 6 -justify center
 set .server.port_ovl_value.minmax "1024 65535 $tcp_port_ovl"
 tooltip .server.port_ovl_value "1024 \u2264 [mc x15] \u2264 65535"
-if {$server_version >= 1702} {
-  pack .server.port_ovl -expand 1 -fill x -pady 1
-  pack .server.port_ovl_value -in .server.port_ovl \
+pack .server.port_ovl -expand 1 -fill x -pady 1
+pack .server.port_ovl_value -in .server.port_ovl \
 	-side right -anchor e -expand 1 -padx {3 0}
-}
 
 # Maximum size of TCP listening queue
 
@@ -1883,7 +1898,7 @@ proc srv_start {srv} {
 
   set engine ${::rendering.engine}
   if {$engine != "(default)"} {
-    set engine [file dirname [file normalize $::server_jar]]/$engine
+    set engine [file dirname $::server_jar]/$engine
     if {$::java_version <= 8} {
       lappend command -Xbootclasspath/p:$engine
       set engine [regsub {.jar} $engine {-sun-java2d.jar}]
@@ -1917,21 +1932,17 @@ proc srv_start {srv} {
   lappend command -Dsun.java2d.renderer.useFastMath=true
   lappend command -Dsun.java2d.render.bufferSize=524288
 
-  lappend command -jar [file normalize $::server_jar]
+  lappend command -jar $::server_jar
   lappend command -if ${::tcp.interface} -p ${port}
 
   if {$srv == "srv"} {
-    set maps_folder [file normalize $::maps_folder]
     set map_list [lmap index [.maps_values curselection] \
-	{set map $maps_folder/[.maps_values get $index]}]
+	{set map $::maps_folder/[.maps_values get $index]}]
     lappend command -m [join $map_list ","]
-    if {$::server_version >= 1704} {
-      if {${::maps.world} == 1} {lappend command -wm}
-    }
+    if {${::maps.world} == 1} {lappend command -wm}
     set theme [.themes_values get]
     if {$theme != "(default)"} {
-      set themes_folder [file normalize $::themes_folder]
-      set theme_file "$themes_folder/$theme"
+      set theme_file "$::themes_folder/$theme"
       lappend command -t $theme_file
       if {[winfo manager .styles] != ""} {
 	lassign [get_selected_style_overlays] style_id overlay_ids
@@ -1970,7 +1981,7 @@ proc srv_start {srv} {
     set magnitude ${::shading.magnitude}
     if {$magnitude == ""} {set magnitude 1.}
     lappend command -hm "$magnitude"
-    lappend command -d [file normalize ${::dem.folder}]
+    lappend command -d ${::dem.folder}
   }
 
   lappend command -mxq ${::tcp.maxconn}
@@ -1986,13 +1997,13 @@ proc srv_start {srv} {
   # Send dummy render request and wait for rendering initialization
 
   set url "http://127.0.0.1:${port}/0/0/0.png"
-  if {$::server_version < 1703} {append url "?"}
   while {[process_running $srv]} {
     if {[catch {::http::geturl $url} token]} {after 10; continue}
     set size [::http::size $token]
     ::http::cleanup $token
     if {$size} {break}
   }
+  after 20
   update
 
   if {![process_running $srv]} {error_message [mc m55 $name] return}
@@ -2076,6 +2087,11 @@ clean_mapsforge
 
 wm withdraw .
 
+# Save settings to folder ini_folder
+
+foreach item {global shading mytourbook} {save_${item}_settings}
+if {[winfo manager .styles] != ""} {save_theme_settings}
+
 # Wait until output console window was closed
 
 if {[winfo ismapped .console]} {
@@ -2084,11 +2100,6 @@ if {[winfo ismapped .console]} {
   bind .console <ButtonRelease-3> "destroy .console"
   tkwait window .console
 }
-
-# Save settings to folder ini_folder
-
-foreach item {global shading mytourbook} {save_${item}_settings}
-if {[winfo manager .styles] != ""} {save_theme_settings}
 
 # Done
 
