@@ -78,7 +78,7 @@ m55	"Unerwartetes Ende von %s"
 m56	"Suche Desktop-Fenster von Prozess %d (%s)"
 m57	"Keine Desktop-Fenster von Prozess %d (%s) gefunden"
 m58	"Sende Window-Manager-Nachricht 'Schließen' an Prozess %d (%s)"
-m59	"%s nicht gestartet.\nTCP-Port '%s' bereits in Benutzung"
+m59	"%s nicht gestartet.\nTCP-Port '%s' nicht verfügbar:\n%s"
 m60	"Lösche MyTourbook-Kachelspeicher '%s'"
 
 c80	"Schummerung einschalten"
