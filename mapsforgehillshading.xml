@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <MapProviderList Created="2022-04-14T12:48:19.461727700+02:00[Europe/Berlin]" IsExport="true" VersionMajor="21" VersionMicro="1" VersionMinor="6" VersionQualifier="20210702-0713">
-<MapProvider Category="" CustomUrl="http://127.0.0.1:60816/{zoom}/{x}/{y}.png" Description="" FavoriteLatitude="49.413876" FavoriteLongitude="8.700657" FavoriteZoomLevel="13" Id="mapsforgehillshading" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="49.413876" LastUsedLongitude="8.700657" LastUsedZoomLevel="13" Modified="2022-04-11T22:34:39.576277700+02:00[Europe/Berlin]" Name="MapsforgeHillshading" OfflineFolder="mapsforgehillshading" OnlineMapUrl="" Type="custom" UserAgent="" ZoomMax="17" ZoomMin="9" isIncludesHillShading="false" isTransparentLayer="false">
+<MapProvider Category="" CustomUrl="http://127.0.0.1:60816/{zoom}/{x}/{y}.png" Description="" FavoriteLatitude="49.413876" FavoriteLongitude="8.700657" FavoriteZoomLevel="13" Id="mapsforgehillshading" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="49.413876" LastUsedLongitude="8.700657" LastUsedZoomLevel="13" Modified="2022-04-11T22:34:39.576277700+02:00[Europe/Berlin]" Name="MapsforgeHillshading" OfflineFolder="mapsforgehillshading" OnlineMapUrl="" Type="custom" UserAgent="" ZoomMax="18" ZoomMin="7" isIncludesHillShading="false" isTransparentLayer="false">
 <UrlPart Html="http://127.0.0.1:60816/" PartType="HTML" Position="0"/>
 <UrlPart PartType="ZOOM" Position="1"/>
 <UrlPart Html="/" PartType="HTML" Position="2"/>
