@@ -138,6 +138,8 @@ Screenshot of MyTourbook showing Heidelberg (Germany), comparing _2D Tour Map_ a
 
 ### Hints
 
+* Output console  
+While console output of tile server and/or MyTourbook can be informative and helpful to verify what is happening as well as to analyze errors, writing to console costs some performance. Therefore the console should be hidden if not needed.
 * Built-in world map  
 Since the built-in [Mapsforge world map](https://download.mapsforge.org/maps/world/world.map) only shows the coastline, it only serves as a rough overview. Due to map's low resolution, coastlines show inaccurate at high resolution. Because the Mapsforge renderer prefers land on the world map to sea on the selected detailed local map, it may be advisable to disable the built-in world map when rendering coastal regions at high resolution.
 * Hillshading  
