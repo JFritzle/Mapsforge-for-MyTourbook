@@ -1736,23 +1736,24 @@ proc process_start {command process} {
   puti "[mc m51 $pid $exe]"
 
   append mark {\[} [string toupper $process] {\]}
+
   fileevent $fd readable "
 	while {\[gets $fd line\] >= 0} {puts \"$mark \$line\"};
 	if {\[eof $fd\]} {
-	  close $fd;
-	  namespace delete $process;
-	  set ::action 0;
-	  puti \"[mc m52 $pid $exe]\";
+	  close $fd; namespace delete $process;
+	  puti \[mc m52 $pid $exe\];
+	  set $process.eof 1; set action 0;
 	}"
 
 }
 
-# Process stop by closing its desktop window(s) procedure
+# Stop MyTourbook by closing its desktop window(s)
 # and give process a chance to terminate itself gracefully
 # before being killed forcibly
 
-proc process_stop {process} {
+proc mtb_stop {} {
 
+  set process mtb
   if {![namespace exists $process]} {return}
   namespace upvar $process pid pid exe exe
 
@@ -1837,20 +1838,15 @@ proc process_stop {process} {
 proc process_kill {process} {
 
   if {![namespace exists $process]} {return}
-  namespace upvar $process fd fd pid pid exe exe
+  namespace upvar $process fd fd pid pid
 
-  fileevent $fd readable ""
-  close $fd
-  update
+  fileevent $fd readable [regsub {m52} [fileevent $fd readable] {m53}]
 
   if {$::tcl_platform(os) == "Windows NT"} {
     catch {exec TASKKILL /F /PID $pid}
   } elseif {$::tcl_platform(os) == "Linux"} {
     catch {exec kill -SIGTERM $pid}
   }
-
-  puti "[mc m53 $pid $exe]"
-  namespace delete $process
 
 }
 
@@ -2016,17 +2012,24 @@ proc srv_start {srv} {
 
 proc srv_stop {srv} {
 
+  if {![namespace exists $srv]} {return}
+  namespace upvar $srv fd fd port port
+
+  fileevent $fd readable [regsub "action" [fileevent $fd readable] "{}"]
+
   if {$::server_version < 1900} {
     process_kill $srv
   } else {
-    namespace upvar $srv fd fd port port
-    fileevent $fd readable [regsub "action" [fileevent $fd readable] "{}"]
     set url "http://127.0.0.1:${port}/terminate"
     if {![catch {::http::geturl $url} token]} {
-      if {[::http::status $token] != "eof"} {process_kill $srv}
+      if {[::http::status $token] == "eof"} {set code 200} \
+      else {set code [::http::ncode $token]}
+      if {$code != 200} {process_kill $srv}
       ::http::cleanup $token
     }
   }
+  if {![info exists ::$srv.eof]} {vwait $srv.eof}
+  unset ::$srv.eof
 
 }
 
@@ -2095,13 +2098,12 @@ unset action
 
 # Stop Mapsforge tile server first, avoid 'sendError' exception
 
-foreach item {srv ovl} \
-  {if {[process_running $item]} {srv_stop $item}}
+foreach item {srv ovl} {srv_stop $item}
 
 # Stop MyTourbook or kill, if not terminating on request
 
-foreach item {stop kill} \
-  {if {[process_running mtb]} {process_$item mtb}}
+mtb_stop
+process_kill mtb
 
 # Delete Mapsforge tile cache folder(s)
 
