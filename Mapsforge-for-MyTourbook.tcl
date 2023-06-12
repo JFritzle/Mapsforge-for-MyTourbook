@@ -92,8 +92,9 @@ if {[file exist $file]} {
   exit
 }
 
-# Try to replace settings file's relative paths by absolute paths,
-# but preserve commands if resolved by search path
+# Process user settings:
+# replace commands resolved by current search path
+# replace relative paths by absolute paths
 
 # - commands
 set cmds {java_cmd mtb_cmd}
@@ -108,8 +109,10 @@ foreach item $list {
   if {![info exists $item]} {continue}
   set value [set $item]
   if {$value == ""} {continue}
-  if {[lsearch -exact $cmds $item] != -1 && \
-      [auto_execok $value] != ""} {continue}
+  if {[lsearch -exact $cmds $item] != -1} {
+    set exec [auto_execok $value]
+    if {$exec != ""} {set value [lindex $exec 0]}
+  }
   switch [file pathtype $value] {
     absolute		{set $item [file normalize $value]}
     relative		{set $item [file normalize $cwd/$value]}
@@ -327,11 +330,17 @@ if {$console == 1} {
 proc puti {text} {puts "\[---\] $text"}
 proc putw {text} {puts "\[+++\] $text"}
 
-# Show error message procedure
+# Show error message
 
 proc error_message {message exit_return} {
   messagebox -title $::title -icon error -message $message
   eval $exit_return
+}
+
+# Get shell command from exec command
+
+proc get_shell_command {command} {
+  return [join [lmap item $command {regsub {^(.* +.*|())$} $item {"\1"}}]]
 }
 
 # Check if MyTourbook already running
@@ -384,7 +393,7 @@ if {[tk windowingsystem] == "x11"} {set env(GDK_BACKEND) x11}
 
 foreach item {mtb_cmd java_cmd} {
   set value [set $item]
-  if {[auto_execok $value] == ""} {error_message [mc e04 $value $item] exit}
+  if {$value == ""} {error_message [mc e04 $value $item] exit}
 }
 foreach item {server_jar} {
   set value [set $item]
@@ -400,10 +409,9 @@ foreach item {maps_folder themes_folder} {
 set java_version 0
 set java_string "unknown"
 set command [list $java_cmd -version]
-set rc [catch {open "| $command 2>@1" r} fd]
-if {$rc} {error_message "$command\n$fd" exit}
-fconfigure $fd -buffering line
-if {[gets $fd line] != -1} {
+set rc [catch "exec $command 2>@1" result]
+if {!$rc} {
+  set line [lindex [split $result "\n"] 0]
   regsub -nocase {^.* version "(.*)".*$} $line {\1} data
   set java_string $data
   if {[regsub {1\.([1-9][0-9]*)\.[0-9]?.*} $data {\1} data] > 0} {
@@ -412,13 +420,14 @@ if {[gets $fd line] != -1} {
     set java_version $data; # Other Java versions
   }
 }
-set rc [catch "close $fd" error]
-if {$rc} {error_message "$command\n$error" exit}
+
+if {$rc || $java_version == 0} \
+  {error_message [mc e08 Java [get_shell_command $command] $result] exit}
 
 # Prepend Java executable's path to PATH environment variable
 # to force same Java executable for nested Java calls
 
-set path [file dirname [file normalize {*}[auto_execok $java_cmd]]]
+set path [file dirname $java_cmd]
 if {$tcl_platform(os) == "Windows NT"} {
   set env(PATH) "[file nativename $path]\;$env(PATH)"
 } elseif {$tcl_platform(os) == "Linux"} {
@@ -431,10 +440,8 @@ if {$tcl_platform(os) == "Windows NT"} {
 set server_version 0
 set server_string "unknown"
 set command [list $java_cmd -jar $server_jar -h]
-set rc [catch {open "| $command" r} fd]
-if {$rc} {error_message "$command\n$fd" exit}
-fconfigure $fd -buffering line
-while {[gets $fd line] != -1} {
+set rc [catch "exec $command 2>@1" result]
+foreach line [split $result "\n"] {
   if {![regsub -nocase {^.* version: ((?:[0-9]+\.){2}(?:[0-9]+){1}).*$} $line \
 	{\1} data]} {continue}
   set server_string $data
@@ -442,13 +449,14 @@ while {[gets $fd line] != -1} {
 	{set server_version [expr 100*$server_version+$item]}
   break
 }
-set rc [catch "close $fd" error]
-if {$rc} {error_message "$command\n$error" exit}
+
+if {$rc || $server_version == 0} \
+  {error_message [mc e08 Server [get_shell_command $command] $result] exit}
 
 if {$server_version < 1704 } \
-	{error_message [mc e07 $server_string 0.17.4] exit}
+  {error_message [mc e07 $server_string 0.17.4] exit}
 
-# Recursively find files procedure
+# Recursively find files
 
 proc find_files {folder pattern} {
   set list [glob -nocomplain -directory $folder -type f $pattern]
@@ -1716,7 +1724,7 @@ proc clean_mapsforge {} {
 
 }
 
-# Process start procedure
+# Process start
 
 proc process_start {command process} {
 
@@ -1836,7 +1844,7 @@ proc mtb_stop {} {
 
 }
 
-# Process kill procedure
+# Process kill
 
 proc process_kill {process} {
 
@@ -1853,13 +1861,13 @@ proc process_kill {process} {
 
 }
 
-# Check if process is running procedure
+# Check if process is running
 
 proc process_running {process} {
   return [namespace exists $process]
 }
 
-# Mapsforge tile server start procedure
+# Mapsforge tile server start
 
 proc srv_start {srv} {
 
@@ -1989,7 +1997,7 @@ proc srv_start {srv} {
   if {$::server_version >= 1900} {lappend command -term}
 
   puti "[mc m54 $name] ..."
-  puts "[join [lmap item $command {regsub {^(.* +.*|())$} $item {"\1"}}]]"
+  puts "[get_shell_command $command]"
 
   process_start $command $srv
 
@@ -2011,7 +2019,7 @@ proc srv_start {srv} {
 
 }
 
-# Mapsforge tile server stop procedure
+# Mapsforge tile server stop
 
 proc srv_stop {srv} {
 
@@ -2036,7 +2044,7 @@ proc srv_stop {srv} {
 
 }
 
-# MyTourbook start procedure
+# MyTourbook start
 
 proc mtb_start {} {
 
@@ -2045,7 +2053,7 @@ proc mtb_start {} {
 
   set name "MyTourbook \[MTB\]"
   puti "[mc m54 $name] ..."
-  puts "[join [lmap item $command {regsub {^(.* +.*)$} $item {"\1"}}]]"
+  puts "[get_shell_command $command]"
 
   process_start $command mtb
 
