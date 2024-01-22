@@ -15,28 +15,28 @@ set iso_639_1 "de"
 i00	"Fehler beim Lesen der Benutzereinstellungen\nvon Datei '%s'"
 i01	"Erforderliche Benutzereinstellungen fehlen,\nDatei '%s' nicht gefunden"
 
-l01	"Mapsforge für MyTourbook"
+l01	"Mapsforge fÃ¼r MyTourbook"
 
 l11	"Bevorzugte Mapsforge-Kartensprache:\n(2 Kleinbuchstaben ISO 639-1 Code)"
-l11t	"Unterstützte Kartensprachen\nsiehe Ausgabe-Konsole"
+l11t	"UnterstÃ¼tzte Kartensprachen\nsiehe Ausgabe-Konsole"
 l12	"Mapsforge-Renderer"
 l13	"Mapsforge-Kartenordner"
 l14	"Mapsforge-Karte(n)"
-l15	"Mapsforge-Weltkarte hinzufügen"
+l15	"Mapsforge-Weltkarte hinzufÃ¼gen"
 l16	"Mapsforge-Themenordner"
 l17	"Mapsforge-Thema"
 l18	"Themenstil"
 
-e01	"%s '%s'\nmit Prozess-ID %d läuft bereits"
+e01	"%s '%s'\nmit Prozess-ID %d lÃ¤uft bereits"
 e02	"Prozess durch 'kill' beenden\nund neu starten?"
-e03	"Betriebssytem %s nicht unterstützt"
-e04	"Befehl '%s'\ngesetzt durch Variable '%s' ist nicht ausführbar"
+e03	"Betriebssytem %s nicht unterstÃ¼tzt"
+e04	"Befehl '%s'\ngesetzt durch Variable '%s' ist nicht ausfÃ¼hrbar"
 e05	"Ordner/Datei '%s'\ngesetzt durch Variable '%s' existiert nicht"
 e07	"Mapsforge Tile Server-Version ist '%s'.\nMindestens Version '%s' ist erforderlich!"
 e08	"%s-Version kann nicht aus der Befehlsausgabe bestimmt werden!\n\nBefehl:\n%s\nAusgabe:\n%s"
 e11	"Keine Mapsforge-Karte gefunden"
 
-c01	"Overlays zum Stil auswählen"
+c01	"Overlays zum Stil auswÃ¤hlen"
 c02	"Schummerung konfigurieren"
 c03	"Skalierung & Farben"
 c04	"Server konfigurieren"
@@ -59,17 +59,17 @@ x11	"Server-Konfiguration"
 x12	"Rendering-Engine"
 x13	"Netzwerk-Interface(s)"
 x15	"TCP-Port"
-x16	"Größe der TCP-Accept-Queue"
+x16	"GrÃ¶ÃŸe der TCP-Accept-Queue"
 x17	"Minimum gleichzeitiger Threads"
 x18	"Maximum gleichzeitiger Threads"
 
 b01	"Starten"
-b01t	"2D-Karte 'MapsforgeMap' in MyTourbook\naktivieren. Nach Änderung von Einstellungen\ndiesen Knopf 'Starten' erneut drücken,\ndann 2D-Karte in MyTourbook rechtsklicken und\n'Fehlerhafte Karten Bilder nochmals laden'!"
+b01t	"2D-Karte 'MapsforgeMap' in MyTourbook\naktivieren. Nach Ã„nderung von Einstellungen\ndiesen Knopf 'Starten' erneut drÃ¼cken,\ndann 2D-Karte in MyTourbook rechtsklicken und\n'Fehlerhafte Karten Bilder nochmals laden'!"
 b02	"Beenden"
-b02t	"MyTourbook schließen und beenden"
+b02t	"MyTourbook schlieÃŸen und beenden"
 
-e41	"Keine Mapsforge-Karte(n) ausgewählt"
-e45	"DEM-Ordner fehlt oder nicht gültig"
+e41	"Keine Mapsforge-Karte(n) ausgewÃ¤hlt"
+e45	"DEM-Ordner fehlt oder nicht gÃ¼ltig"
 
 m51	"Prozess %d (%s) gestartet"
 m52	"Prozess %d (%s) beendet"
@@ -78,9 +78,9 @@ m54	"Starte %s"
 m55	"Unerwartetes Ende von %s"
 m56	"Suche Desktop-Fenster von Prozess %d (%s)"
 m57	"Keine Desktop-Fenster von Prozess %d (%s) gefunden"
-m58	"Sende Window-Manager-Nachricht 'Schließen' an Prozess %d (%s)"
-m59	"%s nicht gestartet.\nTCP-Port '%s' nicht verfügbar:\n%s"
-m60	"Lösche MyTourbook-Kachelspeicher '%s'"
+m58	"Sende Window-Manager-Nachricht 'SchlieÃŸen' an Prozess %d (%s)"
+m59	"%s nicht gestartet.\nTCP-Port '%s' nicht verfÃ¼gbar:\n%s"
+m60	"LÃ¶sche MyTourbook-Kachelspeicher '%s'"
 
 c80	"Schummerung einschalten"
 c81	"Schummerung auf Karte"
@@ -89,20 +89,20 @@ c82	"Schummerung als Karte"
 c82t	"2D-Karte 'Mapsforge Hillshading'\nin MyTourbook aktivieren"
 
 l81	"DEM-Ordner (Digital Elevation Model)"
-l81t	"HGT-Dateien mit Höhendaten und/oder\nZIP-Archive mit Inhalt gleichnamige HGT-Datei\nBeispiel:\nArchiv N49E008.zip mit Inhalt Datei N49E008.hgt"
-l82	"DEM-Ordner auswählen"
+l81t	"HGT-Dateien mit HÃ¶hendaten und/oder\nZIP-Archive mit Inhalt gleichnamige HGT-Datei\nBeispiel:\nArchiv N49E008.zip mit Inhalt Datei N49E008.hgt"
+l82	"DEM-Ordner auswÃ¤hlen"
 l83	"Algorithmus"
-l84	"Linearität"
+l84	"LinearitÃ¤t"
 l85	"Skalierung"
-l86	"Höhenwinkel der Lichtquelle"
-l87	"Skalierung der Grauwertgröße"
+l86	"HÃ¶henwinkel der Lichtquelle"
+l87	"Skalierung der GrauwertgrÃ¶ÃŸe"
 
 b91	"Alle"
-b91t	"Alles auswählen"
+b91t	"Alles auswÃ¤hlen"
 b92	"Reset"
-b92t	"Zurücksetzen auf\nDefault-Werte"
+b92t	"ZurÃ¼cksetzen auf\nDefault-Werte"
 b93	"Keine"
-b93t	"Alles abwählen"
+b93t	"Alles abwÃ¤hlen"
 
 l99	"Ausgabe-Konsole"
 c99	"Ausgabe-Konsole anzeigen"
@@ -119,7 +119,7 @@ m99	"Ausgabe-Konsole kann jetzt geschlossen werden!"
 # mtb_cmd
 #   Befehl um MyTourbook von der Befehlszeile aufzurufen
 #   Entweder absoluter oder relativer Pfad der MyTourbook-Programmdatei (.exe)
-#   oder Name der MyTourbook-Programmdatei, falls über den Suchpfad gefunden
+#   oder Name der MyTourbook-Programmdatei, falls Ã¼ber den Suchpfad gefunden
 # mtb_args
 #   Weitere optionale MyTourbook-Argumente
 # maps_folder
@@ -131,21 +131,21 @@ m99	"Ausgabe-Konsole kann jetzt geschlossen werden!"
 # java_cmd
 #   Befehl um Java von der Befehlszeile aufzurufen
 #   Entweder absoluter oder relativer Pfad der Java-Programmdatei (.exe)
-#   oder Name der Java-Programmdatei, falls über den Suchpfad gefunden
+#   oder Name der Java-Programmdatei, falls Ã¼ber den Suchpfad gefunden
 # java_args
 #   Weitere optionale Java-Argumente
 # server_jar
 #   Absoluter oder relativer Pfad des Mapsforge Tile Servers Java-Archiv (.jar)
-#   mapsforgesrv-fatjar.jar ... für Java version 11 oder höher
+#   mapsforgesrv-fatjar.jar ... fÃ¼r Java version 11 oder hÃ¶her
 # tcp_port
-#   TCP-Port für Kommunikation zwischen Mapsforge Tile Server und MyTourbook
+#   TCP-Port fÃ¼r Kommunikation zwischen Mapsforge Tile Server und MyTourbook
 #   (1024 <= Port <= 65535)
 # language
 #   Bevorzugte Mapsforge-Kartensprache (2 Kleinbuchstaben ISO 639-1 Code)
-#   (z.B. "en", "fr", "de" etc. oder "" für Mapsforge-Defaultsprache)
+#   (z.B. "en", "fr", "de" etc. oder "" fÃ¼r Mapsforge-Defaultsprache)
 # interface
-#   Netzwerk-Interface des Mapsforge Tile Servers für eingehende Anfragen
-#   "localhost" ... Höre nur auf IPv4-Loopback-Interface & Adresse 127.0.0.1
-#   "all"       ... Höre auf alle Netwerk-Interfaces
+#   Netzwerk-Interface des Mapsforge Tile Servers fÃ¼r eingehende Anfragen
+#   "localhost" ... HÃ¶re nur auf IPv4-Loopback-Interface & Adresse 127.0.0.1
+#   "all"       ... HÃ¶re auf alle Netwerk-Interfaces
 #
 # -- Ende der Beschreibung ----------------------------------------------------

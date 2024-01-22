@@ -24,6 +24,9 @@ set script [file normalize [info script]]
 set cwd [pwd]
 encoding system utf-8
 
+if {$tcl_version <  9.0} {set home [file normalize ~]}
+if {$tcl_version >= 9.0} {set home [file tildeexpand ~]}
+
 wm withdraw .
 
 # Required packages and procedure aliases
@@ -109,6 +112,7 @@ foreach item $list {
   if {![info exists $item]} {continue}
   set value [set $item]
   if {$value == ""} {continue}
+  if {$tcl_version >= 9.0} {set value [file tildeexpand $value]}
   if {[lsearch -exact $cmds $item] != -1} {
     set exec [auto_execok $value]
     if {$exec != ""} {set value [lindex $exec 0]}
@@ -124,7 +128,7 @@ cd $cwd
 
 # Restore saved settings from folder ini_folder
 
-if {![info exists ini_folder]} {set ini_folder [file normalize ~/.Mapsforge]}
+if {![info exists ini_folder]} {set ini_folder $home/.Mapsforge}
 file mkdir $ini_folder
 
 set maps.selection {}
@@ -1616,9 +1620,9 @@ proc clean_mapsforge {} {
 
   # MyTourbook's configuration & plugins folder
   if {$::tcl_platform(os) == "Windows NT"} {
-    set config "~/mytourbook"
+    set config "$::home/mytourbook"
   } elseif {$::tcl_platform(os) == "Linux"} {
-    set config "~/.mytourbook"
+    set config "$::home/.mytourbook"
   }
   set plugins "$config/.metadata/.plugins"
 
@@ -1711,7 +1715,7 @@ proc process_start {command process} {
   set ${process}::command $command
 
   set fd $result
-  fconfigure $fd -blocking 0 -buffering line
+  fconfigure $fd -blocking 0 -buffering line -encoding iso8859-1
 
   set pid [pid $fd]
   set exe [file tail [lindex $command 0]]
