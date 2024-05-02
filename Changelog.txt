@@ -1,3 +1,7 @@
+2024-05-02
+
+- Fixed typo causing "Error in startup script"
+
 2024-05-01
 
 - Refine work around Oracle's Java wrapper "java.exe" issue (Windows only!)
