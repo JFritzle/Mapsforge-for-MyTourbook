@@ -551,7 +551,7 @@ foreach item {maps_folder themes_folder} {
 # therefore not working within Tcl script called by "wish"!
 # -> Try getting Java's real path from Windows registry
 
-iif {$tcl_platform(os) == "Windows NT" && 
+if {$tcl_platform(os) == "Windows NT" && 
   ([regexp -nocase {^.*/Program Files.*/Common Files/Oracle/Java/.*/java.exe$} $java_cmd]
    || [regexp -nocase {^.*/ProgramData/Oracle/Java/.*/java.exe$} $java_cmd])} {
   set exec ""
