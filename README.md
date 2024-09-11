@@ -113,6 +113,8 @@ Import _2D Map_ map provider files with Drag&Drop or _Import_ button in the pref
 * File _mapsforgehillshading.xml_ defines _2D Map_ custom map provider _MapsforgeHillshading_ fetching alpha-transparent hillshading tiles from tile server if selected in graphical user interface.
 * File _mapsforgemaphillshading.xml_ defines _2D Map_ map profile _MapsforgeMapHillshading_ which composes Mapsforge server's map tiles with Mapsforge server's alpha-transparent hillshading.
 
+Edit imported map providers and make sure that port number(s) in MyTourbook’s _Custom Url_ match port number(s) defined in Mapsforge-for-MyTourbook graphical user interface server configuration's _TCP port(s)_.
+
 Set map provider _MapsforgeMapHillshading_ visible, whether hillshading  in graphical user interface is enabled or not and whether "Hillshading on map" or "Hillshading as map" is selected in graphical user interface.
 
 Custom map provider _MapsforgeHillshading_ can also be used in other map profiles to supply map with alpha-transparent hillshading, e.g. OpenStreetMap. File _openstreetmaphillshading.xml_ defines _2D Map_ map profile _OpenStreetMapHillshading_ which composes MyTourbook's built-in map provider OpenStreetMap with Mapsforge server's alpha-transparent hillshading.
