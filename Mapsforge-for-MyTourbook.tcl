@@ -27,7 +27,7 @@ set cwd [pwd]
 
 # Required packages
 
-foreach item {Thread msgcat tooltip http dns ip} {
+foreach item {Thread msgcat tooltip http md5 dns ip} {
   if {[catch "package require $item"]} {
     ::tk::MessageBox -title $title -icon error \
 	-message "Could not load required Tcl package '$item'" \
@@ -49,6 +49,7 @@ interp alias {} ::checkbutton {} ::ttk::checkbutton
 interp alias {} ::combobox {} ::ttk::combobox
 interp alias {} ::radiobutton {} ::ttk::radiobutton
 interp alias {} ::scrollbar {} ::ttk::scrollbar
+interp alias {} ::md5 {} ::md5::md5
 
 # Define color palette
 
@@ -92,8 +93,8 @@ Entry.insertBackground WindowText
 Entry.highlightColor WindowFrame
 Listbox.background Window
 Listbox.highlightColor WindowFrame
-Tooltip.Label.background InfoBackground
-Tooltip.Label.foreground InfoText
+Tooltip*Label.background InfoBackground
+Tooltip*Label.foreground InfoText
 } {option add *$item [set color::$value]}
 
 set dialog.wrapLength [expr [winfo screenwidth .]/2]
@@ -110,8 +111,8 @@ Labelframe.borderWidth 0
 Scale.highlightThickness 1
 Scale.showValue 0
 Scale.takeFocus 1
-Tooltip.Label.padX 2
-Tooltip.Label.padY 2
+Tooltip*Label.padX 2
+Tooltip*Label.padY 2
 } {eval option add *$item $value}
 
 # Global ttk widget options
@@ -330,9 +331,10 @@ set tcp_port_ovl [incr tcp_port]
 set tcp.port_srv $tcp_port_srv
 set tcp.port_ovl $tcp_port_ovl
 set tcp.interface $interface
-set tcp.maxconn 256
+set tcp.maxconn 1024
 set threads.min 0
 set threads.max 8
+set log.requests 1
 
 set tms_name_srv "Mapsforge Map"
 set tms_name_ovl "Mapsforge Hillshading"
@@ -508,6 +510,8 @@ if {$tcl_platform(os) == "Windows NT"} {
 	{HKEY_CURRENT_USER\Control Panel\International} {LocaleName}]
     set language [regsub {(.*)-(.*)} $language {\1}]
   }
+  if {![info exists env(TMP)]} {set env(TMP) $env(HOME)]}
+  set tmpdir [file normalize $env(TMP)]
 } elseif {$tcl_platform(os) == "Linux"} {
   set exe [file tail $mtb_cmd]
   set rc [catch {exec pgrep -n -u $tcl_platform(user) $exe} result]
@@ -522,6 +526,8 @@ if {$tcl_platform(os) == "Windows NT"} {
     set language [regsub {(.*)_(.*)} $env(LANG) {\1}]
     if {$env(LANG) == "C"} {set language "en"}
   }
+  if {![info exists env(TMPDIR)]} {set env(TMPDIR) /tmp}
+  set tmpdir $env(TMPDIR)
 } else {
   error_message [mc e03 $tcl_platform(os)] exit
 }
@@ -551,7 +557,7 @@ foreach item {maps_folder themes_folder} {
 # therefore not working within Tcl script called by "wish"!
 # -> Try getting Java's real path from Windows registry
 
-if {$tcl_platform(os) == "Windows NT" && 
+if {$tcl_platform(os) == "Windows NT" &&
   ([regexp -nocase {^.*/Program Files.*/Common Files/Oracle/Java/.*/java.exe$} $java_cmd]
    || [regexp -nocase {^.*/ProgramData/Oracle/Java/.*/java.exe$} $java_cmd])} {
   set exec ""
@@ -576,7 +582,7 @@ set java_string "unknown"
 set command [list $java_cmd -version]
 set rc [catch "exec $command 2>@1" result]
 if {!$rc} {
-  set line [lindex [split $result "\n"] 0]
+  set line [lindex [split $result \n] 0]
   regsub -nocase {^.* version "(.*)".*$} $line {\1} data
   set java_string $data
   if {[regsub {^1\.([1-9]+)\.[0-9]+.*$} $java_string {\1} data] > 0} {
@@ -601,25 +607,27 @@ if {$tcl_platform(os) == "Windows NT"} {
 }
 
 # Evaluate numeric tile server version
-# from output line containing version string " version: x.y.z"
+# from output line containing version string " version: x.y.z[.c]"
 
 set server_version 0
 set server_string "unknown"
-set command [list $java_cmd -jar $server_jar -h]
+set command [list $java_cmd -jar $server_jar -help]
 set rc [catch "exec $command 2>@1" result]
-foreach line [split $result "\n"] {
-  if {![regsub -nocase {^.* version: ((?:[0-9]+\.){2}(?:[0-9]+){1}).*$} $line \
-	{\1} data]} {continue}
+foreach line [split $result \n] {
+  if {![regexp -nocase {^(?:.* version: )([0-9.]+)$} $line "" data]} {continue}
   set server_string $data
-  foreach item [split $data .] \
-	{set server_version [expr 100*$server_version+$item]}
+  set data [split $data .]
+  if {[llength $data] == 3} {set server_type 0}
+  if {[llength $data] == 4} {set server_type 1}
+  while {[llength $data] < 4} {lappend data 0}
+  foreach item $data {set server_version [expr 100*$server_version+$item]}
   break
 }
 
 if {$rc || $server_version == 0} \
   {error_message [mc e08 Server [get_shell_command $command] $result] exit}
 
-if {$server_version < 1704 } \
+if {$server_version < 170400} \
   {error_message [mc e07 $server_string 0.17.4] exit}
 
 # Recursively find files
@@ -647,8 +655,8 @@ if {[llength $maps] == 0} {error_message [mc e11] exit}
 cd $themes_folder
 set themes [find_files "" "*.xml"]
 cd $cwd
-if {$::server_version <  2000} {lappend themes "(default)"}
-if {$::server_version >= 2000} {lappend themes "(DEFAULT)" "(OSMARENDER)"}
+if {$::server_version <  200000} {lappend themes "(default)"}
+if {$::server_version >= 200000} {lappend themes "(DEFAULT)" "(OSMARENDER)"}
 set themes [lsort -dictionary $themes]
 
 # --- Begin of main window
@@ -663,11 +671,11 @@ pack .title -expand 1 -fill x
 set github "https://github.com/JFritzle/Mapsforge-for-MyTourbook"
 tooltip .title "$github"
 if {$tcl_platform(platform) == "windows"} {
-  set script "exec cmd.exe /C START {} $github"
+  set exec "exec cmd.exe /C START {} $github"
 } elseif {$tcl_platform(os) == "Linux"} {
-  set script "exec nohup xdg-open $github >/dev/null"
+  set exec "exec nohup xdg-open $github >/dev/null"
 }
-bind .title <ButtonRelease-1> "catch {$script}"
+bind .title <ButtonRelease-1> "catch {$exec}"
 
 # Menu column
 
@@ -1050,7 +1058,6 @@ foreach widget {.shading.simple_value1 .shading.simple_value2 \
 
 proc save_shading_settings {} {uplevel #0 {
   set fd [open "$ini_folder/hillshading.ini" w]
-  fconfigure $fd -buffering full
   foreach name {shading.onoff shading.algorithm \
 	shading.simple.linearity shading.simple.scale \
 	shading.diffuselight.angle shading.magnitude dem.folder} {
@@ -1097,7 +1104,7 @@ label .effects.line_value -textvariable line.scale -width 4 \
 set row 0
 grid .effects.scaling -row $row -column 1 -columnspan 3 -sticky we
 set list {user text symbol}
-if {$server_version >= 2100 } {lappend list line}
+if {$server_version >= 210000} {lappend list line}
 foreach item $list {
   incr row
   grid .effects.${item}_label -row $row -column 1 -sticky w -padx {0 2}
@@ -1243,17 +1250,19 @@ tooltip .server.port_ovl [mc c82t]
 entry .server.port_ovl_value -textvariable tcp.port_ovl \
 	-width 6 -justify center
 set .server.port_ovl_value.minmax "1024 65535 $tcp_port_ovl"
+if {$server_type == 0} {
 tooltip .server.port_ovl_value "1024 ≤ [mc x15] ≤ 65535"
 pack .server.port_ovl -expand 1 -fill x -pady 1
 pack .server.port_ovl_value -in .server.port_ovl \
 	-side right -anchor e -expand 1 -padx {3 0}
+}
 
 # Maximum size of TCP listening queue
 
 labelframe .server.maxconn -labelanchor w -text [mc x16]:
 entry .server.maxconn_value -textvariable tcp.maxconn \
 	-width 6 -justify center
-set .server.maxconn_value.minmax {0 {} 256}
+set .server.maxconn_value.minmax {0 {} 1024}
 tooltip .server.maxconn_value "[mc x16] ≥ 0"
 pack .server.maxconn -expand 1 -fill x -pady 1
 pack .server.maxconn_value -in .server.maxconn \
@@ -1265,10 +1274,12 @@ labelframe .server.threadsmin -labelanchor w -text [mc x17]:
 entry .server.threadsmin_value -textvariable threads.min \
 	-width 6 -justify center
 set .server.threadsmin_value.minmax {0 {} 0}
+if {$server_type == 0} {
 tooltip .server.threadsmin_value "[mc x17] ≥ 0"
 pack .server.threadsmin -expand 1 -fill x -pady {6 1}
 pack .server.threadsmin_value -in .server.threadsmin \
 	-side right -anchor e -expand 1 -padx {3 0}
+}
 
 # Maximum number of concurrent threads
 
@@ -1276,10 +1287,19 @@ labelframe .server.threadsmax -labelanchor w -text [mc x18]:
 entry .server.threadsmax_value -textvariable threads.max \
 	-width 6 -justify center
 set .server.threadsmax_value.minmax {4 {} 8}
+if {$server_type == 0} {
 tooltip .server.threadsmax_value "[mc x18] ≥ 4"
 pack .server.threadsmax -expand 1 -fill x -pady 1
 pack .server.threadsmax_value -in .server.threadsmax \
 	-side right -anchor e -expand 1 -padx {3 0}
+}
+
+# Enable/disable server request logging
+
+checkbutton .server.logrequests -text [mc x19] -variable log.requests
+if {$server_type == 1} {
+pack .server.logrequests -expand 1 -fill x
+}
 
 # Reset server configuration
 
@@ -1379,19 +1399,7 @@ proc setup_styles_overlays_structure {} {
   close $fd
 
   # Split into list of elements between "<" and ">"
-  set elements {}
-  set string ""
-  foreach char [split $data ""] {
-    if {$char == "<"} {
-      set string $char
-    } elseif {$char == ">"} {
-      append string $char
-      lappend elements $string
-      set string ""
-    } else {
-      append string $char
-    }
-  }
+  set elements [regexp -inline -all {<.*?>} $data]
 
   # Search for hillshading element
   if {[lsearch -regexp $elements {<hillshading\s+.*?>}] == -1} {
@@ -1644,7 +1652,6 @@ proc save_theme_settings {} {
   set style_id [lindex $style 0]
   set ini_file "$::ini_folder/theme.[regsub -all {/} $theme {.}].ini"
   set fd [open "$ini_file" w]
-  fconfigure $fd -buffering full
   puts $fd "defaultstyle=$style_id"
   foreach style ${::style.table} {
     set style_id [lindex $style 0]
@@ -1673,11 +1680,10 @@ proc save_global_settings {} {uplevel #0 {
   set console.geometry [send $ctid "set geometry"]
   set console.font.size [send $ctid "font configure font -size"]
   set fd [open "$ini_folder/global.ini" w]
-  fconfigure $fd -buffering full
   foreach name {renderer.name rendering.engine maps.language \
 	maps.selection maps.world maps.contrast maps.gamma \
 	theme.selection user.scale text.scale symbol.scale line.scale \
-	tcp.maxconn threads.min threads.max \
+	tcp.maxconn threads.min threads.max log.requests \
 	window.geometry font.size \
 	console.show console.geometry console.font.size} {
     puts $fd "$name=[set $name]"
@@ -1689,7 +1695,6 @@ proc save_global_settings {} {uplevel #0 {
 
 proc save_mytourbook_settings {} {uplevel #0 {
   set fd [open "$ini_folder/mytourbook.ini" w]
-  fconfigure $fd -buffering full
   foreach name {tcp.interface tcp.port_srv tcp.port_ovl shading.layer} {
     puts $fd "$name=[set $name]"
   }
@@ -1815,7 +1820,7 @@ proc clean_mapsforge {} {
   set file "$plugins/org.eclipse.core.runtime/.settings/net.tourbook.prefs"
   set rc [catch {open $file r} fd]
   if {!$rc} {
-    set data [split [read $fd] "\n"]
+    set data [split [read $fd] \n]
     close $fd
     foreach item {OffLineCache_Path} {
       set index [lsearch -regexp $data "^$item="]
@@ -1832,7 +1837,7 @@ proc clean_mapsforge {} {
   set file "$plugins/net.tourbook/custom-map-provider.xml"
   set rc [catch {open $file r} fd]
   if {!$rc} {
-    set data [split [read $fd] "\n"]
+    set data [split [read $fd] \n]
     close $fd
     set data [regexp -all -inline {(?:<MapProvider )(.*?)(?:>)(?:.*?)(?:</MapProvider>)} $data]
     foreach {"" item} $data {
@@ -1951,8 +1956,7 @@ proc mtb_stop {} {
   set window_ids {}
   if {$::tcl_platform(os) == "Windows NT"} {
     # Search main desktop window of process
-    regsub -all -- {\\} $::env(TEMP) {/} tmpdir
-    set tmp "$tmpdir/tmp.tcl[pid]"
+    set tmp "$::tmpdir/tmp"
     set fd [open $tmp.ps1 w]
     puts $fd "\$PROCESS = Get-Process -id $pid"
     puts $fd "\$PROCESS.MainWindowHandle | out-file -encoding ASCII \"$tmp.log\""
@@ -1963,7 +1967,7 @@ proc mtb_stop {} {
     if {$rc} {cputw "PowerShell ended abnormally"; cputw "$result"}
     set rc [catch {open $tmp.log r} fd]
     if {$rc == 0} {
-      set window_ids [read -nonewline $fd]
+      set window_ids [read $fd]
       close $fd
     }
     catch "file delete $tmp.log"
@@ -2060,17 +2064,19 @@ proc srv_start {srv} {
     if {!${::shading.onoff} || ${::shading.layer} == "onmap"} {
       srv_stop ovl
       clean_mapsforge
+      unset -nocomplain ::tms_md5_ovl
       return
     }
     # No hillshading without map
     if {![process_running srv]} {return}
   }
 
+  if {[set ::tms_restart_$srv]} {srv_stop $srv}
+
   # Compose command line
 
   set port [set ::tcp.port_$srv]
   set name [set ::tms_name_$srv]
-  append name " Server \[[string toupper $srv]\]"
 
   lappend command $::java_cmd -Xmx1G -Xms256M -Xmn256M
   if {[info exists ::java_args]} {lappend command {*}$::java_args}
@@ -2092,9 +2098,15 @@ proc srv_start {srv} {
 # set now [clock format [clock seconds] -format "%Y-%m-%d_%H-%M-%S"]
 # lappend command -Xloggc:$::cwd/gc.$now.log -XX:+PrintGCDetails
 # lappend command -Dlog4j.debug
-# lappend command -Dlog4j.configuration=file:<folder>/log4j.properties
+  lappend command -Dlog4j.configuration=file:$::tmpdir/log4j.properties
 
   lappend command -Dsun.java2d.opengl=true
+# lappend command -Dsun.java2d.d3d=true
+# lappend command -Dsun.java2d.accthreshold=0
+# lappend command -Dsun.java2d.translaccel=true
+# lappend command -Dsun.java2d.ddforcevram=true
+# lappend command -Dsun.java2d.ddscale=true
+# lappend command -Dsun.java2d.ddblit=true
 # lappend command -Dsun.java2d.renderer.log=true
   lappend command -Dsun.java2d.renderer.log=false
   lappend command -Dsun.java2d.renderer.useLogger=true
@@ -2111,40 +2123,74 @@ proc srv_start {srv} {
   lappend command -Dsun.java2d.renderer.subPixel_log2_Y=2
   lappend command -Dsun.java2d.renderer.useFastMath=true
   lappend command -Dsun.java2d.render.bufferSize=524288
+# lappend command -Dawt.useSystemAAFontSettings=on
 
   lappend command -jar $::server_jar
-  lappend command -if ${::tcp.interface} -p ${port}
+
+  if {$::server_type == 1} {
+    set config $::tmpdir/config
+    file mkdir $config/tasks
+  }
+
+  if {$::server_type == 1 && $srv == "srv"} {
+    lappend command -config [file nativename $config]
+
+    set file server.properties
+    set data "terminate=true\n"
+    append data "requestlog-format="
+    if {${::log.requests}} {append data "From %{client}a Get %U%q Status %s Size %O bytes Time %{ms}T ms"}
+    append data "\n"
+    if {${::tcp.interface} == "localhost"} {append data "host=localhost\n"}
+    append data "port=${::tcp.port_srv}\n"
+    append data "acceptQueueSize=${::tcp.maxconn}\n"
+    set md5 [md5 -hex [encoding convertto utf-8 $data]]
+
+    if {![info exists ::tms_md5_$file] || $md5 != [set ::tms_md5_$file]} {
+      set ::tms_md5_$file $md5
+      srv_stop $srv
+      set fd [open $config/$file w]
+      puts -nonewline $fd $data
+      close $fd
+    }
+
+  }
+
+  set params {}
+  if {$::server_type == 0} {
+    lappend params interface ${::tcp.interface}
+    lappend params port $port
+  }
 
   if {$srv == "srv"} {
+    set renderer [.renderer_values get]
+    lappend params renderer $renderer
+    set language [.lang_value get]
+    if {$language != ""} {lappend params language $language}
+
     set map_list [lmap item ${::maps.selection} {set map $::maps_folder/$item}]
-    lappend command -m [join $map_list ","]
-    if {${::maps.world} == 1} {lappend command -wm}
+    lappend params mapfiles [join $map_list ,]
+    if {${::maps.world} == 1} {lappend params worldmap true}
     set theme [.themes_values get]
     if {$theme == "(DEFAULT)" || $theme == "(OSMARENDER)"} {
-      lappend command -t [string trim $theme ()]
+      lappend params themefile) [string trim $theme ()]
     } elseif {$theme != "(default)"} {
       set theme_file "$::themes_folder/$theme"
-      lappend command -t $theme_file
+      lappend params themefile $theme_file
       if {[winfo manager .styles] != ""} {
 	lassign [get_selected_style_overlays] style_id overlay_ids
-	lappend command -s $style_id
-	lappend command -o $overlay_ids
+	lappend params style $style_id
+	lappend params overlays $overlay_ids
       }
     }
-    set language [.lang_value get]
-    if {$language != ""} {lappend command -l $language}
-    set renderer [.renderer_values get]
-    lappend command -r $renderer
 
-    lappend command -gc ${::maps.gamma}
-    lappend command -cs ${::maps.contrast}
-
-    lappend command -sft ${::text.scale}
-    lappend command -sfs ${::symbol.scale}
-    lappend command -sfu ${::user.scale}
-    if {$::server_version >= 2100 } {lappend command -sfl ${::line.scale}}
-  } elseif {$srv == "ovl"} {
-    lappend command -m ""
+    lappend params gamma-correction ${::maps.gamma}
+    lappend params contrast-stretch ${::maps.contrast}
+    lappend params text-scale ${::text.scale}
+    lappend params symbol-scale ${::symbol.scale}
+    lappend params text-scale ${::user.scale}
+    if {$::server_version >= 210000} {lappend params line-scale ${::line.scale}}
+  } elseif {$srv == "ovl" && $::server_type == 0} {
+    lappend params mapfiles ""
   }
 
   if {$shading} {
@@ -2154,46 +2200,81 @@ proc srv_start {srv} {
       set scale ${::shading.simple.scale}
       if {$linearity == ""} {set linearity 0.1}
       if {$scale == ""} {set scale 0.666}
-      lappend command -hs "$algorithm\($linearity,$scale\)"
+      lappend params hillshading-algorithm "$algorithm\($linearity,$scale\)"
     } else {
       set angle ${::shading.diffuselight.angle}
       if {$angle == ""} {set angle 50.}
-      lappend command -hs "$algorithm\($angle\)"
+      lappend params hillshading-algorithm "$algorithm\($angle\)"
     }
     set magnitude ${::shading.magnitude}
     if {$magnitude == ""} {set magnitude 1.}
-    lappend command -hm "$magnitude"
-    lappend command -d ${::dem.folder}
+    lappend params hillshading-magnitude "$magnitude"
+    lappend params demfolder ${::dem.folder}
   }
 
-  lappend command -mxq ${::tcp.maxconn}
-  lappend command -mxt ${::threads.max}
-  lappend command -mit ${::threads.min}
-
-  if {$::server_version >= 1900} {lappend command -term}
-
-  if {[process_running $srv]} {
-    # Server already running: command line is the same?
-    # -> Yes: no restart required, No: stop and restart
-    if {$command == [set ${srv}::command] && ![set ::tms_restart_$srv]} {return}
-    srv_stop $srv
-    clean_mapsforge
-  } else {
-    # Server not yet running: TCP port is currently in use?
-    set count 0
-    while {$count < 5} {
-      set rc [catch {socket -server {} -myaddr 127.0.0.1 $port} fd]
-      if {!$rc} {break}
-      incr count
-      after 200
-    }
-    if {$rc} {
-      error_message [mc m59 $name $port $fd] return
-      return
-    }
-    close $fd
-    update
+  if {$::server_type == 0} {
+    lappend params max-queuesize ${::tcp.maxconn}
+    lappend params max-thread ${::threads.max}
+    lappend params min-thread ${::threads.min}
+    if {$::server_version >= 190000} {lappend params terminate true}
   }
+
+  set md5 [md5 -hex [encoding convertto utf-8 $params]]
+
+  if {$::server_type == 0} {
+
+    foreach {item value} $params {lappend command -$item $value}
+
+    if {![info exists ::tms_md5_$srv]} {
+      set ::tms_md5_$srv $md5
+    } elseif {$md5 != [set ::tms_md5_$srv]} {
+      set ::tms_md5_$srv $md5
+      srv_stop $srv
+      clean_mapsforge
+    }
+
+  } elseif {$::server_type == 1} {
+
+    set data ""
+    foreach {item value} $params {append data "$item=$value\n"}
+
+    set task [lindex [split $name] 1]
+    if {![info exists ::tms_md5_$srv]} {
+      set ::tms_md5_$srv $md5
+      set fd [open $config/tasks/$task.properties w]
+      puts -nonewline $fd $data
+      close $fd
+      cputi "URL: http://127.0.0.1:$port/{z}/{x}/{y}.png?task=$task"
+    } elseif {$md5 != [set ::tms_md5_$srv]} {
+      clean_mapsforge
+      set ::tms_md5_$srv $md5
+      set fd [open $config/tasks/$task.properties w]
+      puts -nonewline $fd $data
+      close $fd
+      cputi "URL: http://127.0.0.1:$port/{z}/{x}/{y}.png?task=$task"
+    }
+
+    if {$srv == "ovl"} {return}
+
+  }
+
+  if {[process_running $srv]} {return}
+
+  append name " Server \[[string toupper $srv]\]"
+  # Server not yet running: TCP port is currently in use?
+  set count 0
+  while {$count < 5} {
+    set rc [catch {socket -server {} -myaddr 127.0.0.1 $port} fd]
+    if {!$rc} {break}
+    incr count
+    after 200
+  }
+  if {$rc} {
+    error_message [mc m59 $name $port $fd] return
+    return
+  }
+  close $fd
+  update
 
   # Start server
 
@@ -2207,6 +2288,7 @@ proc srv_start {srv} {
   # Send dummy render request and wait for rendering initialization
 
   set url "http://127.0.0.1:${port}/0/0/0.png"
+  if {$::server_type == 1} {append url "?task=$task"}
   while {[process_running $srv]} {
     if {[catch {::http::geturl $url} token]} {after 10; continue}
     set size [::http::size $token]
@@ -2225,12 +2307,14 @@ proc srv_start {srv} {
 
 proc srv_stop {srv} {
 
+  if {$::server_type == 1 && $srv == "ovl"} {return}
+
   if {![process_running $srv]} {return}
   namespace upvar $srv fd fd port port
 
   fileevent $fd readable [regsub "action" [fileevent $fd readable] "{}"]
 
-  if {$::server_version < 1900} {
+  if {$::server_version < 190000} {
     process_kill $srv
   } else {
     set url "http://127.0.0.1:${port}/terminate"
@@ -2288,9 +2372,27 @@ while {1} {
   if {[selection_ok]} {break}
 }
 
+# Create server's temporary files folder
+
+append tmpdir /[format "TCL%8.8x" [pid]]
+file mkdir $tmpdir
+
+# Create server logging properties
+
+set fd [open $tmpdir/log4j.properties w]
+puts $fd "log4j.rootLogger=INFO, stdout"
+puts $fd "log4j.appender.stdout.encoding=UTF-8"
+puts $fd "log4j.appender.stdout=org.apache.log4j.ConsoleAppender"
+puts $fd "log4j.appender.stdout.Target=System.out"
+puts $fd "log4j.appender.stdout.layout=org.apache.log4j.PatternLayout"
+puts $fd "log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss.SSS} %m%n"
+close $fd
+
 # Start Mapsforge tile server
 
 busy_state 1
+set tms_restart_srv 0
+set tms_restart_ovl 0
 srv_start srv
 
 # Start MyTourbook (if server is running)
@@ -2317,7 +2419,7 @@ while {$action == 1} {
   unset action
   if {[selection_ok]} {
     busy_state 1
-    foreach item {srv ovl} {srv_start $item}
+    foreach item {ovl srv} {srv_start $item}
     busy_state 0
     update idletasks
   }
@@ -2335,8 +2437,10 @@ mtb_stop
 if {[process_running mtb]} {process_kill mtb}
 
 # Delete Mapsforge tile cache folder(s)
+# Delete temporary files folder
 
 clean_mapsforge
+catch "file delete -force $tmpdir"
 
 # Unmap main toplevel window
 
@@ -2361,4 +2465,11 @@ if {[send $ctid "winfo ismapped ."]} {
 # Done
 
 destroy .
+
+# Let Windows OS remove remaining temporary folder after some delay
+if {$tcl_platform(os) == "Windows NT" && [file isdirectory $tmpdir]} {
+  regsub -all {/} $tmpdir {\\\\} tmp
+  exec cmd.exe /C "TIMEOUT /T 1 /NOBREAK > NUL & RMDIR /S /Q $tmp" &
+}
+
 exit

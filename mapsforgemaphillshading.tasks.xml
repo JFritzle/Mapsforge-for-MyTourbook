@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MapProviderList Created="2024-09-11T14:46:44.342761400+02:00[Europe/Berlin]" IsExport="true" VersionMajor="22" VersionMicro="0" VersionMinor="3" VersionQualifier="20220409-0644">
+<MapProvider BackgroundColor="16777215" Category="OSM" Description="" FavoriteLatitude="49.410526" FavoriteLongitude="8.686237" FavoriteZoomLevel="13" Id="mapsforgemaphillshading" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="49.410526" LastUsedLongitude="8.686237" LastUsedZoomLevel="13" Modified="2022-04-15T17:02:46.888005+02:00[Europe/Berlin]" Name="MapsforgeMapHillshading" OfflineFolder="mapsforgemaphillshading" OnlineMapUrl="http://127.0.0.1:60815/{zoom}/{x}/{y}.png" Type="profile" UserAgent="" ZoomMax="22" ZoomMin="0" isIncludesHillShading="false" isTransparentLayer="false">
+<MapProviderWrapper Alpha="100" BrightnessForNextMP="77" Id="mapsforgemap" IsBlackTransparent="false" IsBrightnessForNextMP="false" IsDisplayed="true" IsTransparent="false" Position="0" Type="custom">
+<TransparentColor Value="15265521"/>
+</MapProviderWrapper>
+<MapProviderWrapper Alpha="100" BrightnessForNextMP="77" Id="mapsforgehillshading" IsBlackTransparent="false" IsBrightnessForNextMP="false" IsDisplayed="true" IsTransparent="false" Position="1" Type="custom">
+<TransparentColor Value="15265521"/>
+</MapProviderWrapper>
+</MapProvider>
+<WrappedMapProvider Category="" CustomUrl="http://127.0.0.1:60815/{zoom}/{x}/{y}.png?task=Map" Description="" FavoriteLatitude="49.413876" FavoriteLongitude="8.700657" FavoriteZoomLevel="13" Id="mapsforgemap" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="49.41399" LastUsedLongitude="8.700657" LastUsedZoomLevel="13" Modified="2024-09-11T14:38:48.463718400+02:00[Europe/Berlin]" Name="MapsforgeMap" OfflineFolder="mapsforgemap" OnlineMapUrl="" Type="custom" UserAgent="" ZoomMax="22" ZoomMin="0" isIncludesHillShading="false" isTransparentLayer="false">
+<UrlPart Html="http://127.0.0.1:60815" PartType="HTML" Position="0"/>
+<UrlPart Html="/" PartType="HTML" Position="1"/>
+<UrlPart PartType="ZOOM" Position="2"/>
+<UrlPart Html="/" PartType="HTML" Position="3"/>
+<UrlPart PartType="X" Position="4"/>
+<UrlPart Html="/" PartType="HTML" Position="5"/>
+<UrlPart PartType="Y" Position="6"/>
+<UrlPart Html=".png?task=Map" PartType="HTML" Position="7"/>
+</WrappedMapProvider>
+<WrappedMapProvider Category="" CustomUrl="http://127.0.0.1:60815/{zoom}/{x}/{y}.png?task=Hillshading" Description="" FavoriteLatitude="49.413765" FavoriteLongitude="8.700657" FavoriteZoomLevel="13" Id="mapsforgehillshading" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="49.413765" LastUsedLongitude="8.700657" LastUsedZoomLevel="13" Modified="2024-09-11T14:40:13.505384200+02:00[Europe/Berlin]" Name="MapsforgeHillshading" OfflineFolder="mapsforgehillshading" OnlineMapUrl="" Type="custom" UserAgent="" ZoomMax="17" ZoomMin="9" isIncludesHillShading="false" isTransparentLayer="false">
+<UrlPart Html="http://127.0.0.1:60815" PartType="HTML" Position="0"/>
+<UrlPart Html="/" PartType="HTML" Position="1"/>
+<UrlPart PartType="ZOOM" Position="2"/>
+<UrlPart Html="/" PartType="HTML" Position="3"/>
+<UrlPart PartType="X" Position="4"/>
+<UrlPart Html="/" PartType="HTML" Position="5"/>
+<UrlPart PartType="Y" Position="6"/>
+<UrlPart Html=".png?task=Hillshading" PartType="HTML" Position="7"/>
+</WrappedMapProvider>
+</MapProviderList>

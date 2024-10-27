@@ -35,6 +35,7 @@ e05	"Ordner/Datei '%s'\ngesetzt durch Variable '%s' existiert nicht"
 e07	"Mapsforge Tile Server-Version ist '%s'.\nMindestens Version '%s' ist erforderlich!"
 e08	"%s-Version kann nicht aus der Befehlsausgabe bestimmt werden!\n\nBefehl:\n%s\nAusgabe:\n%s"
 e11	"Keine Mapsforge-Karte gefunden"
+e15	"Server-Konfigurationsdatei '%s' in Ordner\n'%s'\nexistiert nicht"
 
 c01	"Overlays zum Stil auswählen"
 c02	"Schummerung konfigurieren"
@@ -63,9 +64,10 @@ x15	"TCP-Port"
 x16	"Größe der TCP-Accept-Queue"
 x17	"Minimum gleichzeitiger Threads"
 x18	"Maximum gleichzeitiger Threads"
+x19	"Logging von Server-Requests"
 
 b01	"Starten"
-b01t	"2D-Karte 'MapsforgeMap' in MyTourbook\naktivieren. Nach Änderung von Einstellungen\ndiesen Knopf 'Starten' erneut drücken,\ndann 2D-Karte in MyTourbook rechtsklicken und\n'Fehlerhafte Karten Bilder nochmals laden'!"
+b01t	"2D-Karte 'MapsforgeMap' in MyTourbook\naktivieren. Nach Änderung von Einstellungen\ndiesen Knopf 'Starten' erneut drücken,\ndann 2D-Karte in MyTourbook rechtsklicken und\n'Fehlerhafte Karten Bilder nochmals laden'!\nDoppelklick erzwingt einen Serverneustart."
 b02	"Beenden"
 b02t	"MyTourbook schließen und beenden"
 
@@ -85,7 +87,7 @@ m60	"Lösche MyTourbook-Kachelspeicher '%s'"
 
 c80	"Schummerung einschalten"
 c81	"Schummerung auf Karte"
-c81t	"Schummerung muss im\nMapsforge-Thema aktiviert sein!"
+c81t	"Schummerung muss im\nMapsforge-Thema aktiviert sein"
 c82	"Schummerung als Karte"
 c82t	"2D-Karte 'Mapsforge Hillshading'\nin MyTourbook aktivieren"
 
@@ -111,42 +113,3 @@ m99	"Ausgabe-Konsole kann jetzt geschlossen werden!"
 
 };	# Do not remove: end of translations
 	# Do not remove: end of file (Ctrl+Z)
-
-# -- Beschreibung der Skript-Variablen ----------------------------------------
-#
-# ini_folder
-#   Absoluter oder relativer Pfad des Ordners
-#   zum Sichern/Wiederherstellen der Einstellungen
-# mtb_cmd
-#   Befehl um MyTourbook von der Befehlszeile aufzurufen
-#   Entweder absoluter oder relativer Pfad der MyTourbook-Programmdatei (.exe)
-#   oder Name der MyTourbook-Programmdatei, falls über den Suchpfad gefunden
-# mtb_args
-#   Weitere optionale MyTourbook-Argumente
-# maps_folder
-#   Absoluter oder relativer Pfad des Ordners, rekursiv durchsucht
-#   nach Mapsforge-Karten mit Endung .map durchsucht
-# themes_folder
-#   Absoluter oder relativer Pfad des Ordners, rekursiv durchsucht
-#   nach Mapsforge-Themen mit Endung .xml durchsucht
-# java_cmd
-#   Befehl um Java von der Befehlszeile aufzurufen
-#   Entweder absoluter oder relativer Pfad der Java-Programmdatei (.exe)
-#   oder Name der Java-Programmdatei, falls über den Suchpfad gefunden
-# java_args
-#   Weitere optionale Java-Argumente
-# server_jar
-#   Absoluter oder relativer Pfad des Mapsforge Tile Servers Java-Archiv (.jar)
-#   mapsforgesrv-fatjar.jar ... für Java version 11 oder höher
-# tcp_port
-#   TCP-Port für Kommunikation zwischen Mapsforge Tile Server und MyTourbook
-#   (1024 <= Port <= 65535)
-# language
-#   Bevorzugte Mapsforge-Kartensprache (2 Kleinbuchstaben ISO 639-1 Code)
-#   (z.B. "en", "fr", "de" etc. oder "" für Mapsforge-Defaultsprache)
-# interface
-#   Netzwerk-Interface des Mapsforge Tile Servers für eingehende Anfragen
-#   "localhost" ... Höre nur auf IPv4-Loopback-Interface & Adresse 127.0.0.1
-#   "all"       ... Höre auf alle Netwerk-Interfaces
-#
-# -- Ende der Beschreibung ----------------------------------------------------

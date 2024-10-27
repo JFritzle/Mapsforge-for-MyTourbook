@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MapProviderList Created="2024-09-11T14:47:19.006165400+02:00[Europe/Berlin]" IsExport="true" VersionMajor="22" VersionMicro="0" VersionMinor="3" VersionQualifier="20220409-0644">
+<MapProvider BackgroundColor="16777215" Category="" Description="" FavoriteLatitude="0.0" FavoriteLongitude="0.0" FavoriteZoomLevel="0" Id="openstreetmaphillshading" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="0.0" LastUsedLongitude="0.0" LastUsedZoomLevel="0" Modified="2022-04-23T11:25:20.409327800+02:00[Europe/Berlin]" Name="OpenStreetMapHillshading" OfflineFolder="openstreetmaphillshading" OnlineMapUrl="" Type="profile" UserAgent="" ZoomMax="22" ZoomMin="0" isIncludesHillShading="false" isTransparentLayer="false">
+<MapProviderWrapper Alpha="100" BrightnessForNextMP="77" Id="osm" IsBlackTransparent="false" IsBrightnessForNextMP="false" IsDisplayed="true" IsTransparent="false" Position="0" Type="plugin">
+<TransparentColor Value="15265521"/>
+</MapProviderWrapper>
+<MapProviderWrapper Alpha="100" BrightnessForNextMP="77" Id="mapsforgehillshading" IsBlackTransparent="false" IsBrightnessForNextMP="false" IsDisplayed="true" IsTransparent="false" Position="1" Type="custom">
+<TransparentColor Value="15265521"/>
+</MapProviderWrapper>
+</MapProvider>
+<WrappedMapProvider Category="OSM" Description="" FavoriteLatitude="0.0" FavoriteLongitude="0.0" FavoriteZoomLevel="0" Id="osm" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="0.0" LastUsedLongitude="0.0" LastUsedZoomLevel="0" Name="OpenStreetMap" OfflineFolder="osm" OnlineMapUrl="https://www.openstreetmap.org" Type="plugin" UserAgent="MyTourbook/22.3.0" ZoomMax="19" ZoomMin="0" isIncludesHillShading="false" isTransparentLayer="false"/>
+<WrappedMapProvider Category="" CustomUrl="http://127.0.0.1:60815/{zoom}/{x}/{y}.png?task=Hillshading" Description="" FavoriteLatitude="49.413765" FavoriteLongitude="8.700657" FavoriteZoomLevel="13" Id="mapsforgehillshading" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="49.413765" LastUsedLongitude="8.700657" LastUsedZoomLevel="13" Modified="2024-09-11T14:40:13.505384200+02:00[Europe/Berlin]" Name="MapsforgeHillshading" OfflineFolder="mapsforgehillshading" OnlineMapUrl="" Type="custom" UserAgent="" ZoomMax="17" ZoomMin="9" isIncludesHillShading="false" isTransparentLayer="false">
+<UrlPart Html="http://127.0.0.1:60815" PartType="HTML" Position="0"/>
+<UrlPart Html="/" PartType="HTML" Position="1"/>
+<UrlPart PartType="ZOOM" Position="2"/>
+<UrlPart Html="/" PartType="HTML" Position="3"/>
+<UrlPart PartType="X" Position="4"/>
+<UrlPart Html="/" PartType="HTML" Position="5"/>
+<UrlPart PartType="Y" Position="6"/>
+<UrlPart Html=".png?task=Hillshading" PartType="HTML" Position="7"/>
+</WrappedMapProvider>
+</MapProviderList>

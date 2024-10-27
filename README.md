@@ -6,6 +6,8 @@ MyTourbook supports offline Mapsforge maps as _2.5D Tour Maps_ out of the box us
 
 MyTourbook however is also able to handle _2D Tour Maps_ provided as raster tiles by a Tile Map Service (TMS), which is mainly used by web mapping servers. To make local Mapsforge maps nevertheless available as _2D Tour Maps_ within MyTourbook, a local tile server can be set up to render these Mapsforge maps and to interact with MyTourbook via TMS protocol. The corresponding tile server is available at this [mapsforgesrv](https://github.com/telemaxx/mapsforgesrv) repository.
 
+While old tile server type is capable of rendering only one single set of parameters at a time, the new so-called *tasks* server type is capable of rendering multiple sets of parameters concurrently. Thus, a single *tasks* server instance can replace multiple old server instances.  
+
 ### Graphical user interface
 This project’s intension is to easily let the user interactively and comfortably select the numerous available options of tile server. In addition, option settings as well as position and font size of graphical user interface automatically get saved and restored. Tile server and MyTourbook get started/restarted using these options without need to manually set up any configuration files. 
 
@@ -26,28 +28,30 @@ Windows: If not yet installed, download and install latest MyTourbook version fr
 Linux: If not yet installed, download and install latest MyTourbook version from [download section](https://mytourbook.sourceforge.io/mytourbook/index.php/download-install).  
 Run MyTourbook at least once to initialize program's settings.
 
-2.	Java runtime environment version 17 or higher   
-Windows: If not yet installed, download and install Java, e.g. from [Adoptium](https://adoptium.net).  
-Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ where _<version\>_ is 17 or higher)  
+2.	Java runtime environment (JRE) or Java development kit (JDK)  
+Note: Each JDK contains JRE as subset. JRE version 17 or higher is required   
+Windows: If not yet installed, download and install Java, e.g. from [Adoptium](https:/adoptium.net/de/temurin/releases).  
+Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ or _apt install openjdk-<version\>-jdk_ where _<version\>_ is 17 or higher)  
 Note:  
 Depending on Java runtime environment used, MyTourbook may abort when trying to activate 2.5D or 3D Tour Map. At least Ubuntu's openjdk versions are affected. To avoid, download and install Java from [Adoptium](https://adoptium.net) and set fully qualified path of it's Java executable in _Mapsforge-for-MyTourbook.ini_.
 
 3.	Mapsforge tile server  
-Open [mapsforgesrv](https://github.com/telemaxx/mapsforgesrv) repository, switch branch to master, navigate to folder _mapsforgesrv/bin/jars_ready2use_ and download jar file [_mapsforgesrv-fatjar.jar_](https://github.com/telemaxx/mapsforgesrv/raw/master/mapsforgesrv/bin/jars_ready2use/mapsforgesrv-fatjar.jar).  
+Open [mapsforgesrv releases](https://github.com/telemaxx/mapsforgesrv/releases).  
+For old server type and JRE version 11 or higher, download most recently released jar file _mapsforgesrv-fatjar.jar_ from   _<release\>\_for\_java11_ assets.  
+For new *tasks* server type and JRE version 11 or higher, download most recently released jar file _mapsforgesrv-fatjar.jar_ from _<release\>\_for\_java11_tasks_ assets.
 Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
 Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 Note:  
-Currently Mapsforge tile server version 0.17.4 or higher is required. Previous server versions are no longer supported.
+Currently Mapsforge tile server old server type and new *tasks* server type with server version 0.17.4 or higher is required. Previous server versions are no longer supported.  
 
 4. Alternative Marlin rendering engine (optional, recommended)  
 [Marlin](https://github.com/bourgesl/marlin-renderer) is an open source Java2D rendering engine optimized for performance, replacing the standard built into Java. Download is available at [Marlin-renderer releases](https://github.com/bourgesl/marlin-renderer/releases).  
-For Java version 11 or higher, download jar file _marlin-\*.jar_ from latest _Marlin-renderer \<latest version> for JDK11+_ section's assets.  
-For Java version 8, download both jar files _marlin-\*.jar_ from latest _Marlin-renderer \<latest version> for JDK8_ section's assets.  
-Windows: Copy downloaded jar file(s) into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
-Linux: Copy downloaded jar file(s) into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
+Download jar file _marlin-\*.jar_ from latest _Marlin-renderer \<latest version> for JDK11+_ section's assets.  
+Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
+Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 
 5.	Tcl/Tk scripting language version 8.6 or higher binaries  
-Windows: Download and install latest stable version of Tcl/Tk, currently 8.6.14. See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended Windows binary distribution is from [teclab’s tcltk](https://gitlab.com/teclabat/tcltk/-/packages) Windows repository. Select most recent installation file _tcltk86-8.6.14.\<number>.Win10.nightly.\<date>.tgz_. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
+Windows: Download and install latest stable version of Tcl/Tk, currently 8.6.16. See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended Windows binary distribution is from [teclab’s tcltk](https://gitlab.com/teclabat/tcltk/-/packages) Windows repository. Select most recent installation file _tcltk86-8.6.16.\<number>.Win10.nightly.\<date>.tgz_. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
 Note: [7-Zip](https://www.7-zip.org) file archiver/extractor is able to unpack _.tgz_ archives.  
 Linux: Install packages _tcl, tcllib, tcl-thread, tk_ and _tklib_ using Linux package manager. Since Tcl script now uses threads, package _tcl-thread_ is required. In addition, package _tklib_ is required for using tooltips.  (Ubuntu: _apt install tcl tcllib tcl-thread tk tklib_)
 
@@ -108,7 +112,11 @@ or associate file extension _.tcl_ to Tcl/Tk window shell’s binary _/usr/bin/w
 
 ### MyTourbook integration
 
-Import _2D Map_ map provider files with Drag&Drop or _Import_ button in the preference page for _2D Map_ map providers:
+Import _2D Map_ map provider files with Drag&Drop or _Import_ button in the preference page for _2D Map_ map providers.  
+
+For old tile server type download and import files *<name\>.xml* as mentioned below.  
+For new *tasks* server type download and import files named *<name\>.tasks.xml* instead.
+
 * File _mapsforgemap.xml_ defines _2D Map_ custom map provider _MapsforgeMap_ fetching map tiles from tile server.
 * File _mapsforgehillshading.xml_ defines _2D Map_ custom map provider _MapsforgeHillshading_ fetching alpha-transparent hillshading tiles from tile server if selected in graphical user interface.
 * File _mapsforgemaphillshading.xml_ defines _2D Map_ map profile _MapsforgeMapHillshading_ which composes Mapsforge server's map tiles with Mapsforge server's alpha-transparent hillshading.
@@ -142,7 +150,7 @@ Screenshot of MyTourbook showing Heidelberg (Germany), comparing _2D Tour Map_ a
 * Output console  
 While console output of tile server and/or MyTourbook can be informative and helpful to verify what is happening as well as to analyze errors, writing to console costs some performance. Therefore the console should be hidden if not needed.
 * Built-in world map  
-Since the built-in [Mapsforge world map](https://download.mapsforge.org/maps/world/world.map) only shows the coastline, it only serves as a rough overview. Due to map's low resolution, coastlines show inaccurate at high resolution. Because the Mapsforge renderer prefers land on the world map to sea on the selected detailed local map, it may be advisable to disable the built-in world map when rendering coastal regions at high resolution.
+Since the built-in [Mapsforge world map](https://download.mapsforge.org/maps/world/world.map) only shows the coastline, it only serves as a rough overview. Due to map's low resolution, coastlines show inaccurate at high resolution. Because the Mapsforge renderer prefers land on the world map to sea on the selected detailed local map, it may be advisable to disable the built-in world map when rendering coastal regions at high resolution. In order not to cover an accurate map, the built-in world map has been automatically deactivated at higher zoom levels since tile server version 0.21.3.
 * Hillshading  
   * When selecting "Hillshading on map", map and hillshading are rendered  into one single map. Flat area gets a medium shade of gray, while slopes get a darker or a brighter shade of gray depending on the angle of incidence of light. Thus map has a shade of gray everywhere.  
   * When selecting "Hillshading as map", map and hillshading are rendered as two separate maps. Post-processing hillshading, gray value of flat area gets mapped to full transparency, darker gray values get mapped to transparency levels of black, brighter gray values get mapped to transparency levels of white. Thus the flatter the area, the more the original colors of the map shine through. Finally, hillshading can be used as an alpha-transparent overlay for any map.  

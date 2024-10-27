@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<MapProviderList Created="2024-09-11T14:45:55.348465700+02:00[Europe/Berlin]" IsExport="true" VersionMajor="22" VersionMicro="0" VersionMinor="3" VersionQualifier="20220409-0644">
+<MapProvider Category="" CustomUrl="http://127.0.0.1:60815/{zoom}/{x}/{y}.png?task=Hillshading" Description="" FavoriteLatitude="49.413765" FavoriteLongitude="8.700657" FavoriteZoomLevel="13" Id="mapsforgehillshading" ImageFormat="image/png" ImageSize="256" LastUsedLatitude="49.413765" LastUsedLongitude="8.700657" LastUsedZoomLevel="13" Modified="2024-09-11T14:40:13.505384200+02:00[Europe/Berlin]" Name="MapsforgeHillshading" OfflineFolder="mapsforgehillshading" OnlineMapUrl="" Type="custom" UserAgent="" ZoomMax="17" ZoomMin="9" isIncludesHillShading="false" isTransparentLayer="false">
+<UrlPart Html="http://127.0.0.1:60815" PartType="HTML" Position="0"/>
+<UrlPart Html="/" PartType="HTML" Position="1"/>
+<UrlPart PartType="ZOOM" Position="2"/>
+<UrlPart Html="/" PartType="HTML" Position="3"/>
+<UrlPart PartType="X" Position="4"/>
+<UrlPart Html="/" PartType="HTML" Position="5"/>
+<UrlPart PartType="Y" Position="6"/>
+<UrlPart Html=".png?task=Hillshading" PartType="HTML" Position="7"/>
+</MapProvider>
+</MapProviderList>
