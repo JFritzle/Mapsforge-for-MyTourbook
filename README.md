@@ -20,6 +20,8 @@ Resource files are named _Mapsforge-for-MyTourbook.<locale\>_, where _<locale\>_
 Screenshot of graphical user interface: 
 ![GUI](https://github.com/JFritzle/Mapsforge-for-MyTourbook/assets/62614244/9b5fd702-50ce-45c2-a828-5f48717533cd)
 
+Please note:  
+Old tile server type has reached end of life and version 0.21.4 is last version released. Further development only takes place on new "tasks" server type. After some grace period, graphical user interface support for the old server type will be dropped. Therefore, an early switch to the new server type is recommended.   
 
 ### Installation
 
