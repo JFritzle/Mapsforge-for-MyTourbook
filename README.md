@@ -6,7 +6,9 @@ MyTourbook supports offline Mapsforge maps as _2.5D Tour Maps_ out of the box us
 
 MyTourbook however is also able to handle _2D Tour Maps_ provided as raster tiles by a Tile Map Service (TMS), which is mainly used by web mapping servers. To make local Mapsforge maps nevertheless available as _2D Tour Maps_ within MyTourbook, a local tile server can be set up to render these Mapsforge maps and to interact with MyTourbook via TMS protocol. The corresponding tile server is available at this [mapsforgesrv](https://github.com/telemaxx/mapsforgesrv) repository.
 
-While old tile server type is capable of rendering only one single set of parameters at a time, the new so-called *tasks* server type is capable of rendering multiple sets of parameters concurrently. Thus, a single *tasks* server instance can replace multiple old server instances.  
+While old *single task* server type was capable of rendering only one single set of parameters at a time, the new *multiple tasks* server type is capable of rendering multiple sets of parameters concurrently. Thus, one single *multiple tasks* server instance can replace multiple *single task* server instances.  
+**This Graphical user interface only supports the *multiple tasks* server type.**  
+Latest GUI supporting *single task* server type is still available in GitHub's [*legacy*](https://github.com/JFritzle/Mapsforge-for-MyTourbook/tree/legacy) branch.
 
 ### Graphical user interface
 This project’s intension is to easily let the user interactively and comfortably select the numerous available options of tile server. In addition, option settings as well as position and font size of graphical user interface automatically get saved and restored. Tile server and MyTourbook get started/restarted using these options without need to manually set up any configuration files. 
@@ -18,10 +20,8 @@ User settings file is named _Mapsforge-for-MyTourbook.ini_. A template file is p
 Resource files are named _Mapsforge-for-MyTourbook.<locale\>_, where _<locale\>_ matches locale’s 2 lowercase letters ISO 639-1 code. English localized resource file _Mapsforge-for-MyTourbook.en_ and German localized resource file _Mapsforge-for-MyTourbook.de_ are provided. Script can be easily localized to any other system’s locale by providing a corresponding resource file using English resource file as a template.
 
 Screenshot of graphical user interface: 
-![GUI](https://github.com/JFritzle/Mapsforge-for-MyTourbook/assets/62614244/9b5fd702-50ce-45c2-a828-5f48717533cd)
+![GUI_Windows](https://github.com/user-attachments/assets/ebc74279-5b10-460b-bee9-6076e872a375)
 
-Please note:  
-Old tile server type has reached end of life and version 0.21.4 is last version released. Further development only takes place on new "tasks" server type. After some grace period, graphical user interface support for the old server type will be dropped. Therefore, an early switch to the new server type is recommended.   
 
 ### Installation
 
@@ -31,7 +31,7 @@ Linux: If not yet installed, download and install latest MyTourbook version from
 Run MyTourbook at least once to initialize program's settings.
 
 2.	Java runtime environment (JRE) or Java development kit (JDK)  
-Note: Each JDK contains JRE as subset. JRE version 17 or higher is required   
+Note: JRE version 11 or higher is required by MyTourbook. Each JDK contains JRE as subset.   
 Windows: If not yet installed, download and install Java, e.g. from [Adoptium](https:/adoptium.net/de/temurin/releases).  
 Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ or _apt install openjdk-<version\>-jdk_ where _<version\>_ is 17 or higher)  
 Note:  
@@ -39,12 +39,12 @@ Depending on Java runtime environment used, MyTourbook may abort when trying to 
 
 3.	Mapsforge tile server  
 Open [mapsforgesrv releases](https://github.com/telemaxx/mapsforgesrv/releases).  
-For old server type and JRE version 11 or higher, download most recently released jar file _mapsforgesrv-fatjar.jar_ from   _<release\>\_for\_java11_ assets.  
-For new *tasks* server type and JRE version 11 or higher, download most recently released jar file _mapsforgesrv-fatjar.jar_ from _<release\>\_for\_java11_tasks_ assets.  
+Download most recently released jar file _mapsforgesrv-fatjar.jar_ from   _<release\>\_for\_java11_ assets.  
 Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
 Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 Note:  
-Currently Mapsforge tile server old server type and new *tasks* server type with server version 0.17.4 or higher is required. Previous server versions are no longer supported.  
+New *multiple tasks* server type and server version 0.21.0.0 or higher is required.  
+Old *single task* server type and previous server versions are no longer supported.  
 
 4. Alternative Marlin rendering engine (optional, recommended)  
 [Marlin](https://github.com/bourgesl/marlin-renderer) is an open source Java2D rendering engine optimized for performance, replacing the standard built into Java. Download is available at [Marlin-renderer releases](https://github.com/bourgesl/marlin-renderer/releases).  
@@ -53,7 +53,7 @@ Windows: Copy downloaded jar file into Mapsforge tile server’s installation fo
 Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 
 5.	Tcl/Tk scripting language version 8.6 or higher binaries  
-Windows: Download and install latest stable version of Tcl/Tk, currently 9.0.1. See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended Windows binary distribution is from [teclab’s tcltk](https://gitlab.com/teclabat/tcltk/-/packages) Windows repository. Select most recent installation file _tcltk86-9.0.1.\<number>.Win10.nightly.\<date>.tgz_. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
+Windows: Download and install latest stable version of Tcl/Tk, currently 9.0.1. See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended Windows binary distribution is from [teclab’s tcltk](https://gitlab.com/teclabat/tcltk/-/packages) Windows repository. Select most recent installation file _tcltk90-9.0.1.\<number>.Win10.nightly.\<date>.tgz_. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
 Note: [7-Zip](https://www.7-zip.org) file archiver/extractor is able to unpack _.tgz_ archives.  
 Linux: Install packages _tcl, tcllib, tcl-thread, tk_ and _tklib_ using Linux package manager. Since Tcl script now uses threads, package _tcl-thread_ is required. In addition, package _tklib_ is required for using tooltips.  (Ubuntu: _apt install tcl tcllib tcl-thread tk tklib_)
 
@@ -107,7 +107,7 @@ or associate file extension _.tcl_ to Tcl/Tk window shell’s binary _/usr/bin/w
 
 ### Usage
 
-* After selecting map(s), theme file, theme style, style's overlays etc. in graphical user interface, hit _Start_ button to start tile server and MyTourbook. After MyTourbook has started successfully, activate MyTourbook's map _Mapsforge_ to show map(s) selected in graphical user interface. If changing any settings while MyTourbook is running, a restart of tile server is required to adopt new option settings. To restart server, hit _Start_ button again. As MyTourbook may be configured to cache tiles already loaded with previous settings, it is necessary to clear MyTourbook's tile cache, which happens at restart too. After restart, right-click MyTourbook's 2D Tour Map and force MyTourbook to reload failed map images or by zooming in and out via mouse wheel.
+* After selecting task(s), map(s), theme file, theme style, style's overlays etc. in graphical user interface, hit _Start_ button to start tile server and MyTourbook. After MyTourbook has started successfully, activate MyTourbook's map _Mapsforge_ to show map(s) selected in graphical user interface. If changing any settings while MyTourbook is running, a restart of tile server is required to adopt new option settings. To restart server, hit _Start_ button again. As MyTourbook may be configured to cache tiles already loaded with previous settings, it is necessary to clear MyTourbook's tile cache, which happens at restart too. After restart, right-click MyTourbook's 2D Tour Map and force MyTourbook to reload failed map images or by zooming in and out via mouse wheel.
 * Closing either graphical user interface or MyTourbook window will close tile server too.
 * Use keyboard keys Ctrl-plus to increase and keyboard keys Ctrl-minus to decrease font size of graphical user interface and/or output console.
 * See output console for tile server’s and MyTourbook's output.
@@ -115,9 +115,6 @@ or associate file extension _.tcl_ to Tcl/Tk window shell’s binary _/usr/bin/w
 ### MyTourbook integration
 
 Import _2D Map_ map provider files with Drag&Drop or _Import_ button in the preference page for _2D Map_ map providers.  
-
-For old tile server type download and import files *<name\>.xml* as mentioned below.  
-For new *tasks* server type download and import files named *<name\>.tasks.xml* instead.
 
 * File _mapsforgemap.xml_ defines _2D Map_ custom map provider _MapsforgeMap_ fetching map tiles from tile server.
 * File _mapsforgehillshading.xml_ defines _2D Map_ custom map provider _MapsforgeHillshading_ fetching alpha-transparent hillshading tiles from tile server if selected in graphical user interface.
@@ -129,7 +126,7 @@ Set map provider _MapsforgeMapHillshading_ visible, whether hillshading  in grap
 
 Custom map provider _MapsforgeHillshading_ can also be used in other map profiles to supply map with alpha-transparent hillshading, e.g. OpenStreetMap. File _openstreetmaphillshading.xml_ defines _2D Map_ map profile _OpenStreetMapHillshading_ which composes MyTourbook's built-in map provider OpenStreetMap with Mapsforge server's alpha-transparent hillshading.
 
-![MapProfile](https://user-images.githubusercontent.com/62614244/164914276-bd081152-19f7-4030-90c1-104db92b32d6.jpg)
+![MapProfile](https://github.com/user-attachments/assets/01342dcb-72bf-48f5-bba3-e4000a7a8faf)
 
 Note:  
 Zoom levels shown in _Map Profile Configuration_ are one higher than zoom levels internally used by query to the Mapsforge tile server.
