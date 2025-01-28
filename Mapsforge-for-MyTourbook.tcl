@@ -25,7 +25,7 @@ if {[encoding system] != "utf-8"} {
 if {![info exists tk_version]} {package require Tk}
 wm withdraw .
 
-set version "2025-01-20"
+set version "2025-01-28"
 set script [file normalize [info script]]
 set title [file tail $script]
 set cwd [pwd]
