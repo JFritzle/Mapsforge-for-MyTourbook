@@ -25,7 +25,7 @@ if {[encoding system] != "utf-8"} {
 if {![info exists tk_version]} {package require Tk}
 wm withdraw .
 
-set version "2025-01-28"
+set version "2025-01-20"
 set script [file normalize [info script]]
 set title [file tail $script]
 set cwd [pwd]
@@ -792,6 +792,7 @@ proc task_list_post {} {
     $lb configure -yscrollcommand "$sb set"
   }
   pack $lb -side left -fill x -expand 1
+  tooltip $lb [mc l03t]
 
   $lb insert 0 {*}${::task.set}
   $lb activate 0
