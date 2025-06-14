@@ -48,7 +48,10 @@ Old *single task* server type and previous server versions are no longer support
 
 4. Alternative Marlin rendering engine (optional, recommended)  
 [Marlin](https://github.com/bourgesl/marlin-renderer) is an open source Java2D rendering engine optimized for performance, replacing the standard built into Java. Download is available at [Marlin-renderer releases](https://github.com/bourgesl/marlin-renderer/releases).  
-Download jar file _marlin-\*.jar_ from latest _Marlin-renderer \<latest version> for JDK11+_ section's assets.  
+For JRE version lower than 17, download jar file _marlin-\*.jar_  
+from _Marlin-renderer \<latest version> for JDK11+_ section's assets.  
+For JRE version 17 or higher, download jar file _marlin-\*.jar_  
+from _Marlin-renderer \<latest version> for JDK17+_ section's assets.  
 Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
 Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 
