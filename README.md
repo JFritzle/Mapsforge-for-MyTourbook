@@ -19,9 +19,8 @@ User settings file is named _Mapsforge-for-MyTourbook.ini_. A template file is p
 
 Resource files are named _Mapsforge-for-MyTourbook.<locale\>_, where _<locale\>_ matches locale’s 2 lowercase letters ISO 639-1 code. English localized resource file _Mapsforge-for-MyTourbook.en_ and German localized resource file _Mapsforge-for-MyTourbook.de_ are provided. Script can be easily localized to any other system’s locale by providing a corresponding resource file using English resource file as a template.
 
-Screenshot of graphical user interface: 
-![GUI_Windows](https://github.com/user-attachments/assets/ebc74279-5b10-460b-bee9-6076e872a375)
-
+Screenshot of graphical user interface:  
+![GUI_Windows](https://github.com/user-attachments/assets/c725e598-adc2-4ad9-83d0-a122e259977b)
 
 ### Installation
 
@@ -31,11 +30,9 @@ Linux: If not yet installed, download and install latest MyTourbook version from
 Run MyTourbook at least once to initialize program's settings.
 
 2.	Java runtime environment (JRE) or Java development kit (JDK)  
-Note: JRE version 17 or higher is required by recent MyTourbook version. Each JDK contains JRE as subset.   
+Note: JRE version 21 or higher is required by recent MyTourbook version. Each JDK contains JRE as subset.   
 Windows: If not yet installed, download and install Java, e.g. from [Adoptium](https:/adoptium.net/de/temurin/releases).  
-Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ or _apt install openjdk-<version\>-jdk_ where _<version\>_ is 17 or higher)  
-Note:  
-Depending on Java runtime environment used, MyTourbook may abort when trying to activate 2.5D or 3D Tour Map. At least Ubuntu's openjdk versions are affected. To avoid, download and install Java from [Adoptium](https://adoptium.net) and set fully qualified path of it's Java executable in _Mapsforge-for-MyTourbook.ini_.
+Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ or _apt install openjdk-<version\>-jdk_ where _<version\>_ is 21 or higher)  
 
 3.	Mapsforge tile server  
 Open [mapsforgesrv releases](https://github.com/telemaxx/mapsforgesrv/releases).  
@@ -48,10 +45,7 @@ Old *single task* server type and previous server versions are no longer support
 
 4. Alternative Marlin rendering engine (optional, recommended)  
 [Marlin](https://github.com/bourgesl/marlin-renderer) is an open source Java2D rendering engine optimized for performance, replacing the standard built into Java. Download is available at [Marlin-renderer releases](https://github.com/bourgesl/marlin-renderer/releases).  
-For JRE version lower than 17, download jar file _marlin-\*.jar_  
-from _Marlin-renderer \<latest version> for JDK11+_ section's assets.  
-For JRE version 17 or higher, download jar file _marlin-\*.jar_  
-from _Marlin-renderer \<latest version> for JDK17+_ section's assets.  
+Download jar file _marlin-\*.jar_ from _Marlin-renderer \<latest version> for JDK17+_ section's assets.  
 Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
 Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 
@@ -59,8 +53,7 @@ Linux: Copy downloaded jar file into Mapsforge tile server’s installation fold
 Windows: Download and install latest stable version of Tcl/Tk, currently 9.0.  
 See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended Windows binary distribution is from [teclab’s tcltk](https://gitlab.com/teclabat/tcltk/-/packages) Windows repository. Select most recent installation file _tcltk90-9.0.\<x.y>.Win10.nightly.\<date>.tgz_. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
 Note: [7-Zip](https://www.7-zip.org) file archiver/extractor is able to unpack _.tgz_ archives.   
-Linux: Install packages _tcl, tcllib, tcl-thread, tk_ and _tklib_ using Linux package manager.  
-(Ubuntu: _apt install tcl tcllib tcl-thread tk tklib_)
+Linux: Install packages _tcl, tcllib, tcl-thread, tk_ and _tklib_ using Linux package manager. (Ubuntu: _apt install tcl tcllib tcl-thread tk tklib_)
 
 6.	Mapsforge maps  
 Download Mapsforge maps for example from [openandromaps.org](https://www.openandromaps.org). Each downloaded OpenAndroMaps map archive contains a map file (file extension _.map_). Tile server will render this map file.  

@@ -25,7 +25,7 @@ if {[encoding system] != "utf-8"} {
 if {![info exists tk_version]} {package require Tk}
 wm withdraw .
 
-set version "2025-06-14"
+set version "2025-08-20"
 set script [file normalize [info script]]
 set title [file tail $script]
 set cwd [pwd]
@@ -510,9 +510,8 @@ ctsend {
     .txt yview moveto [lindex $py 0]
   }
 
-  set lines 0
+  set aid 0
   proc write {text} {
-    incr ::lines
     .txt configure -state normal
     if {[string index $text 0] == "\r"} {
       set text [string range $text 1 end]
@@ -520,8 +519,10 @@ ctsend {
     }
     .txt insert end $text
     .txt configure -state disabled
-    .txt see end
-    if {$::lines == 256} {update; set ::lines 0}
+    # Prevent the console from freezing when
+    # flooded with incoming write requests
+    catch "after cancel $::aid"
+    set ::aid [after 100 {.txt see end}]
   }
 
   proc show_hide {show} {
@@ -542,26 +543,16 @@ ctsend {
     }
   }
 
-  lassign [chan pipe] fdi fdo
-  thread::detach $fdo
-  fconfigure $fdi -blocking 0 -buffering line -translation lf
-  fileevent $fdi readable "
-    while {\[gets $fdi line\] >= 0} {write \"\$line\\n\"}
-  "
 }
-
-set fdo [ctsend "set fdo"]
-thread::attach $fdo
-fconfigure $fdo -blocking 0 -buffering line -translation lf
-interp alias {} ::cputs {} ::puts $fdo
 
 if {$console == 1} {
   set console.show 1
   ctsend "show_hide 1"
 }
 
-# Mark output message
+# Write to console
 
+proc cputs {text} {thread::send -async $::ctid [list write $text\n]}
 proc cputi {text} {cputs "\[---\] $text"}
 proc cputw {text} {cputs "\[+++\] $text"}
 
@@ -640,7 +631,7 @@ if {!$rc} {
 
 if {$rc || $java_version == 0} \
   {error_message [mc e08 Java [get_shell_command $command] $result] exit}
-if {$java_version < 17} {error_message [mc e07 Java $java_string 17] exit}
+if {$java_version < 21} {error_message [mc e07 Java $java_string 21] exit}
 
 # Prepend Java executable's path to PATH environment variable
 # to force same Java executable for nested Java calls
@@ -765,6 +756,7 @@ proc task_updown {d} {
   set ::task.name $v
   .task_name icursor end
   set ::task.active $v
+  catch ".task_list.listbox activate $i"
   restore_task_settings $v
 }
 bind .task_name <MouseWheel> {task_updown [expr %D>0?-1:+1]}
@@ -775,7 +767,6 @@ proc task_list_post {} {
   if {![task_item_add]} return
 
   set tl .task_list
-  set tn .task_name
   set lb $tl.listbox
   set sb $tl.scrollbar
 
@@ -784,6 +775,7 @@ proc task_list_post {} {
     return
   }
 
+  set tn .task_name
   set x [winfo rootx $tn]
   set y [winfo rooty $tn]
   scan [winfo geometry $tn] "%dx%d" w h
@@ -807,10 +799,9 @@ proc task_list_post {} {
 
   scrollbar $sb -command "$lb yview"
   set len [llength ${::task.set}]
-  set max 5
   listbox $lb -selectmode multiple -activestyle underline -bd 0 \
-	-takefocus 1 -exportselection 0 -height [expr min($len,$max)]
-  if {$len > $max} {
+	-takefocus 1 -exportselection 0 -height [expr min($len,5)]
+  if {$len > 5} {
     pack $sb -side right -fill y
     $lb configure -yscrollcommand "$sb set"
   }
@@ -826,7 +817,8 @@ proc task_list_post {} {
      incr i
   }
 
-  bind $lb <Map> {focus -force %W}
+  foreach v {Map Enter} \
+	{bind $lb <$v> {focus -force %W}}
   bind $lb <Delete> task_item_delete
   bind $lb <Tab> task_item_toggle
   bind $lb <Key-space> {task_item_toggle;break}
@@ -835,8 +827,9 @@ proc task_list_post {} {
   foreach v {<PrevLine> <NextLine>} \
 	{bind $lb <$v> "[bind Listbox <$v>];task_name_update;break"}
   foreach v {ButtonRelease-3 Escape FocusOut} \
-	{bind $lb <$v> task_list_unpost}
-  bind $tl <Button-1> {button-1-press %W %X %Y}
+	{bind $lb <$v> {task_list_unpost;break}}
+  bind $tl <Button> \
+	{if {"[winfo containing %X %Y]" != "%W"} {task_list_unpost;break}}
 
   wm transient $tl .
   wm attribute $tl -topmost 1
@@ -847,12 +840,12 @@ proc task_list_post {} {
 }
 
 proc task_list_unpost {} {
+  focus -force .task_name
   set tl .task_list
   set lb $tl.listbox
   set ::task.use {}
   foreach i [$lb curselection] {lappend ::task.use [$lb get $i]}
   destroy $tl
-  focus -force .task_name
 }
 
 proc task_name_update {} {
@@ -880,12 +873,16 @@ proc task_item_toggle {} {
 
 proc task_item_delete {} {
   set lb .task_list.listbox
+  set sb .task_list.scrollbar
   set i [$lb index active]
   set v [$lb get $i]
   if {$v == "(default)"} return
   $lb delete $i
-  task_name_update
   set ::task.set [lreplace ${::task.set} $i $i]
+  set len [llength ${::task.set}]
+  $lb configure -height [expr min($len,5)]
+  if {$len <= 5} {pack forget $sb}
+  task_name_update
   set file $::ini_folder/task.$v.ini
   file delete $file
   set ::task.active [$lb get active]
@@ -1065,6 +1062,12 @@ checkbutton .server_show_hide -text [mc c04] \
 	-command "show_hide_toplevel_window .server"
 pack .server_show_hide -in .f -expand 1 -fill x
 
+# Show MyTourbook settings
+
+checkbutton .mtb_show_hide -text [mc c05] \
+	-command "show_hide_toplevel_window .mtb"
+pack .mtb_show_hide -in .f -expand 1 -fill x
+
 # Action buttons
 
 frame .buttons
@@ -1116,8 +1119,9 @@ ctsend "
 # - hillshading settings
 # - visual rendering effects
 # - server settings
+# - MyTourbook settings
 
-foreach widget {.overlays .shading .effects .server} {
+foreach widget {.overlays .shading .effects .server .mtb} {
   set parent ${widget}_show_hide
   toplevel $widget -bd 5
   wm withdraw $widget
@@ -1149,7 +1153,6 @@ proc show_hide_toplevel_window {widget} {
     wm withdraw $widget
   }
 }
-
 
 # Recalculate and force toplevel window size
 
@@ -1201,7 +1204,7 @@ proc position_toplevel_window {widget} {
 
 # Global toplevel bindings
 
-foreach widget {. .overlays .shading .effects .server} {
+foreach widget {. .overlays .shading .effects .server .mtb} {
   bind $widget <Control-plus>  {incr_font_size +1}
   bind $widget <Control-minus> {incr_font_size -1}
   bind $widget <Control-KP_Add>      {incr_font_size +1}
@@ -1623,6 +1626,62 @@ foreach widget {.server.port_value .server.maxconn_value} {
 }
 
 # --- End of server settings
+# --- Begin of MyTourbook settings
+
+# Scaling
+
+label .mtb.scale -text [mc y01]
+
+if {![info exists mtb.scale]} {set mtb.scale off}
+radiobutton .mtb.scale_off_radio -text [mc y02] \
+	-variable mtb.scale -value off
+label .mtb.scale_off_value -text ""
+label .mtb.scale_off_dim -text ""
+
+radiobutton .mtb.scale_disp_radio -text [mc y03] \
+	-variable mtb.scale -value disp
+tooltip .mtb.scale_disp_radio [mc y01t]
+set mtb.scale.disp [expr round([tk scaling]*75)]
+entry .mtb.scale_disp_value -textvariable mtb.scale.disp \
+	-width 5 -justify center -state readonly
+label .mtb.scale_disp_dim -text "%"
+
+if {![info exists mtb.scale.user]} {set mtb.scale.user 100}
+radiobutton .mtb.scale_user_radio -text [mc y04] \
+	-variable mtb.scale -value user
+tooltip .mtb.scale_user_radio [mc y01t]
+entry .mtb.scale_user_value -textvariable mtb.scale.user \
+	-width 5 -justify center
+tooltip .mtb.scale_user_value "50 ≤ [mc y04] ≤ 250"
+set .mtb.scale_user_value.minmax {50 250 100}
+label .mtb.scale_user_dim -text "%"
+
+set row 0
+grid .mtb.scale -row $row -column 1 -columnspan 3 -sticky we
+foreach item {off disp user} {
+  incr row
+  grid .mtb.scale_${item}_radio -row $row -column 1 -sticky we \
+	-padx {0 2}
+  grid .mtb.scale_${item}_value -row $row -column 2 -sticky e
+  grid .mtb.scale_${item}_dim -row $row -column 3 -sticky w
+}
+
+# Reset MyTourbook settings
+
+button .mtb.reset -text [mc b92] -width 8 -command reset_mtb_values
+tooltip .mtb.reset [mc b92t]
+grid .mtb.reset -row 99 -column 1 -columnspan 3 -pady {5 0}
+
+proc reset_mtb_values {} {
+  set ::mtb.scale off
+  set ::mtb.scale.user 100
+}
+
+.mtb.scale_user_value configure -validate all -vcmd {validate_number %W %V %P " " int}
+bind .mtb.scale_user_value <Shift-ButtonRelease-1> \
+	{set [%W cget -textvariable] [lindex ${::%W.minmax} 2]}
+
+# --- End of MyTourbook settings
 # --- Begin of theme file processing
 
 # Get list of attributes from given xml element
@@ -2006,6 +2065,7 @@ proc save_global_settings {} {
 
 proc save_mytourbook_settings {} {
   save_settings $::ini_folder/mytourbook.ini \
+	mtb.scale mtb.scale.user \
 	tcp.interface tcp.port task.use
 }
 
@@ -2073,7 +2133,7 @@ proc incr_font_size {incr} {
 	.effects.symbol_scale .effects.line_scale \
 	.effects.gamma_scale .effects.contrast_scale} \
 	{if {[winfo exists $item]} {$item configure -width $height}}
-  foreach item {. .overlays .shading .effects .server} \
+  foreach item {. .overlays .shading .effects .server .mtb} \
 	{resize_toplevel_window $item}
 }
 
@@ -2550,8 +2610,22 @@ proc srv_stop {} {
 
 proc mtb_start {} {
 
-  lappend command $::mtb_cmd
-  if {[info exists ::mtb_args]} {lappend command {*}$::mtb_args}
+  if {![info exists ::mtb_args]} {set ::mtb_args {}}
+
+  if {${::mtb.scale} == "disp" || ${::mtb.scale} == "user"} {
+    lappend ::mtb_args -Dswt.autoScale=[set ::mtb.scale.${::mtb.scale}]
+  }
+
+  # Override and append MyTourbook's launcher ini file
+  set mtb_dir [file dirname $::mtb_cmd]
+  set mtb_ini [file rootname [file tail $::mtb_cmd]].ini
+  set fdi [open $mtb_dir/$mtb_ini]
+  set fdo [open $::tmpdir/$mtb_ini w]
+  fcopy $fdi $fdo
+  close $fdi
+  foreach item ${::mtb_args} {puts $fdo $item}
+  close $fdo
+  lappend command $::mtb_cmd --launcher.ini "$::tmpdir/$mtb_ini"
 
   set name "MyTourbook \[MTB\]"
   cputi "[mc m54 $name] ..."
@@ -2696,6 +2770,8 @@ puts $fd "log4j.appender.stdout.layout.ConversionPattern=%d{yyyy-MM-dd HH:mm:ss.
 close $fd
 
 # Start Mapsforge server
+
+tk busy hold .mtb -cursor X_cursor
 
 busy_state 1
 set restart_srv 0
