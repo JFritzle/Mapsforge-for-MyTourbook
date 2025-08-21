@@ -1,3 +1,8 @@
+2025-08-21
+
+- If MyTourbook has installed it's own Java environment,
+  currently Java 11 ist still sufficient
+
 2025-08-20
 
 - Modified console output to avoid console potentially

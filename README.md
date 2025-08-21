@@ -30,9 +30,9 @@ Linux: If not yet installed, download and install latest MyTourbook version from
 Run MyTourbook at least once to initialize program's settings.
 
 2.	Java runtime environment (JRE) or Java development kit (JDK)  
-Note: JRE version 21 or higher is required by recent MyTourbook version. Each JDK contains JRE as subset.   
+Note: JRE version 21 or higher is required by recent MyTourbook version. If MyTourbook however has installed it's own Java environment, JRE version 11 is sufficient. Each JDK contains JRE as subset.  
 Windows: If not yet installed, download and install Java, e.g. from [Adoptium](https:/adoptium.net/de/temurin/releases).  
-Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ or _apt install openjdk-<version\>-jdk_ where _<version\>_ is 21 or higher)  
+Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ or _apt install openjdk-<version\>-jdk_ where _<version\>_ is sufficient or higher)  
 
 3.	Mapsforge tile server  
 Open [mapsforgesrv releases](https://github.com/telemaxx/mapsforgesrv/releases).  
