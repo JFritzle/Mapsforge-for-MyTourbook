@@ -1,3 +1,8 @@
+2025-08-22
+
+- Modified console again
+  to prevent from potential core dump on Linux
+
 2025-08-21
 
 - If MyTourbook has installed it's own Java environment,
