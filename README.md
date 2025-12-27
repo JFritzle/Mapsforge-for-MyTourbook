@@ -4,17 +4,17 @@ Graphical user interface between Mapsforge tile server and MyTourbook
 ### About
 MyTourbook supports offline Mapsforge maps as _2.5D Tour Maps_ out of the box using VTM (Vector Tile Map) renderer. Prebuilt Mapsforge maps are provided amongst others by [mapsforge.org](http://download.mapsforge.org) and [openandromaps.org](https://www.openandromaps.org).
 
-MyTourbook however is also able to handle _2D Tour Maps_ provided as raster tiles by a Tile Map Service (TMS), which is mainly used by web mapping servers. To make local Mapsforge maps nevertheless available as _2D Tour Maps_ within MyTourbook, a local tile server can be set up to render these Mapsforge maps and to interact with MyTourbook via TMS protocol. The corresponding tile server is available at this [mapsforgesrv](https://github.com/telemaxx/mapsforgesrv) repository.
+MyTourbook however is also able to handle _2D Tour Maps_ provided as raster tiles by a Tile Map Service (TMS), which is mainly used by web mapping servers. To make local Mapsforge maps nevertheless available as _2D Tour Maps_ within MyTourbook, a local tile server can be set up to render these Mapsforge maps and to interact with MyTourbook via TMS protocol. The corresponding Mapsforge tile server is available at this [mapsforgesrv](https://github.com/telemaxx/mapsforgesrv) repository.
 
 
 ### Graphical user interface
-This project’s intension is to easily let the user interactively and comfortably select the numerous available options of tile server. In addition, option settings as well as position and font size of graphical user interface automatically get saved and restored. Tile server and MyTourbook get started/restarted using these options without need to manually set up any configuration files. 
+This project’s intension is to easily let the user interactively and comfortably select the numerous available options of Mapsforge tile server. In addition, option settings as well as position and font size of graphical user interface automatically get saved and restored. Mapsforge tile server and MyTourbook get started/restarted using these options without need to manually set up any configuration files. 
 
 Graphical user interface is a single script written in _Tcl/Tk_ scripting language and is executable on _Microsoft Windows_ and _Linux_ operating system. Language-neutral script file _Mapsforge-for-MyTourbook.tcl_ requires an additional user settings file and at least one localized resource file. Additional files must follow _Tcl/Tk_ syntax rules too.
 
 User settings file is named _Mapsforge-for-MyTourbook.ini_. A template file is provided.
 
-Resource files are named _Mapsforge-for-MyTourbook.<locale\>_, where _<locale\>_ matches locale’s 2 lowercase letters ISO 639-1 code. English localized resource file _Mapsforge-for-MyTourbook.en_ and German localized resource file _Mapsforge-for-MyTourbook.de_ are provided. Script can be easily localized to any other system’s locale by providing a corresponding resource file using English resource file as a template.
+Resource files are named _Mapsforge-for-MyTourbook.<locale\>_, where _<locale\>_ matches locale’s 2 lowercase letters ISO 639-1 code. English localized resource file _Mapsforge-for-MyTourbook.en_, French localized resource file _Mapsforge-for-QMapShack.fr_ and German localized resource file _Mapsforge-for-MyTourbook.de_ are provided. Script can be easily localized to any other system’s locale by providing a corresponding resource file using English resource file as a template.
 
 Screenshot of graphical user interface:  
 ![GUI_Windows](https://github.com/user-attachments/assets/c725e598-adc2-4ad9-83d0-a122e259977b)
@@ -27,31 +27,32 @@ Linux: If not yet installed, download and install latest MyTourbook version from
 Run MyTourbook at least once to initialize program's settings.
 
 2.	Java runtime environment (JRE) or Java development kit (JDK)  
-Note: JRE version 21 or higher is required by recent MyTourbook version. If MyTourbook however has installed it's own Java environment, JRE version 11 is sufficient. Each JDK contains JRE as subset.  
+Note: JRE version 21 or higher is required by recent MyTourbook version.  
+If MyTourbook however has installed it's own Java environment, JRE version 11 is sufficient. JRE version 17 or higher is recommended. Each JDK contains JRE as subset.  
 Windows: If not yet installed, download and install Java, e.g. from [Adoptium](https:/adoptium.net/de/temurin/releases).  
 Linux: If not yet installed, install Java runtime package using Linux package manager. (Ubuntu: _apt install openjdk-<version\>-jre_ or _apt install openjdk-<version\>-jdk_ where _<version\>_ is sufficient or higher)  
 
 3.	Mapsforge tile server  
 Open [mapsforgesrv releases](https://github.com/telemaxx/mapsforgesrv/releases).  
 Download most recently released jar file _mapsforgesrv-fatjar.jar_ from   _<release\>\_for\_java11_ assets.  
-Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
+Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%ProgramFiles%/MapsforgeSrv_.  
 Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 Note: Server version 0.22.0.0 or higher is required.  
 
 4. Alternative Marlin rendering engine (optional, recommended)  
 [Marlin](https://github.com/bourgesl/marlin-renderer) is an open source Java2D rendering engine optimized for performance, replacing the standard built into Java. Download is available at [Marlin-renderer releases](https://github.com/bourgesl/marlin-renderer/releases).  
 Download jar file _marlin-\*.jar_ from _Marlin-renderer \<latest version> for JDK17+_ section's assets.  
-Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
+Windows: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _%ProgramFiles%/MapsforgeSrv_.  
 Linux: Copy downloaded jar file into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 
 5.	Tcl/Tk scripting language version 8.6 or higher binaries  
 Windows: Download and install latest stable version of Tcl/Tk, currently 9.0.  
-See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended Windows binary distribution is from [teclab’s tcltk](https://gitlab.com/teclabat/tcltk/-/packages) Windows repository. Select most recent installation file _tcltk90-9.0.\<x.y>.Win10.nightly.\<date>.tgz_. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%programfiles%/Tcl_.  
+See https://wiki.tcl-lang.org/page/Binary+Distributions for available binary distributions. Recommended Windows binary distribution is from [teclab’s tcltk](https://gitlab.com/teclabat/tcltk/-/packages) Windows repository. Select most recent installation file _tcltk90-9.0.\<x.y>.Win10.nightly.\<date>.tgz_. Unpack zipped tar archive (file extension _.tgz_) into your Tcl/Tk installation folder, e.g. _%ProgramFiles%/Tcl_.  
 Note: [7-Zip](https://www.7-zip.org) file archiver/extractor is able to unpack _.tgz_ archives.   
 Linux: Install packages _tcl, tcllib, tcl-thread, tk_ and _tklib_ using Linux package manager. (Ubuntu: _apt install tcl tcllib tcl-thread tk tklib_)
 
 6.	Mapsforge maps  
-Download Mapsforge maps for example from [openandromaps.org](https://www.openandromaps.org). Each downloaded OpenAndroMaps map archive contains a map file (file extension _.map_). Tile server will render this map file.  
+Download Mapsforge maps for example from [openandromaps.org](https://www.openandromaps.org). Each downloaded OpenAndroMaps map archive contains a map file (file extension _.map_). Mapsforge tile server will render this map file.  
 
 7.	Mapsforge themes  
 Mapsforge themes _Elevate_ and _Elements_ (file extension _.xml_) suitable for OpenAndroMaps are available for download at [openandromaps.org](https://www.openandromaps.org).  
@@ -71,16 +72,16 @@ While 1\" (arc second) resolution DEM data have a significantly higher accuracy 
 
 9.	Mapsforge for MyTourbook graphical user interface script  
 Download language-neutral script file _Mapsforge-for-MyTourbook.tcl_, user settings file _Mapsforge-for-MyTourbook.ini_  and at least one localized resource file.  
-Windows: Copy downloaded files into Mapsforge tile server’s installation folder, e.g. into folder _%programfiles%/MapsforgeSrv_.  
+Windows: Copy downloaded files into Mapsforge tile server’s installation folder, e.g. into folder _%ProgramFiles%/MapsforgeSrv_.  
 Linux: Copy downloaded files into Mapsforge tile server’s installation folder, e.g. into folder _~/MapsforgeSrv_.  
 Edit _user-defined script variables settings section_ of user settings file _Mapsforge-for-MyTourbook.ini_ to match files and folders of your local installation of Java, Mapsforge tile server and MyTourbook.  
 Important:  
-Always use character slash “/” as directory separator in script, for Microsoft Windows too!
+Always use character slash “/” as directory separator in _Mapsforge-for-MyTourbook.ini_ file, for Microsoft Windows too!
 
 ### Script file execution
 
 Windows:  
-Associate file extension _.tcl_ to Tcl/Tk window shell’s binary _wish.exe_. Right-click script file and open file’s properties window. Change data type _.tcl_ to get opened by _Wish application_ e.g. by executable _%programfiles%/Tcl/bin/wish.exe_. Once file extension has been associated, double-click script file to run.
+Associate file extension _.tcl_ to Tcl/Tk window shell’s binary _wish.exe_. Right-click script file and open file’s properties window. Change data type _.tcl_ to get opened by _Wish application_ e.g. by executable _%ProgramFiles%/Tcl/bin/wish.exe_. Once file extension has been associated, double-click script file to run.
 
 Linux:  
 Either run script file from command line by
@@ -100,17 +101,17 @@ or associate file extension _.tcl_ to Tcl/Tk window shell’s binary _/usr/bin/w
 
 ### Usage
 
-* After selecting task(s), map(s), theme file, theme style, style's overlays etc. in graphical user interface, hit _Start_ button to start tile server and MyTourbook. After MyTourbook has started successfully, activate MyTourbook's map _Mapsforge_ to show map(s) selected in graphical user interface. If changing any settings while MyTourbook is running, a restart of tile server is required to adopt new option settings. To restart server, hit _Start_ button again. As MyTourbook may be configured to cache tiles already loaded with previous settings, it is necessary to clear MyTourbook's tile cache, which happens at restart too. After restart, right-click MyTourbook's 2D Tour Map and force MyTourbook to reload failed map images or by zooming in and out via mouse wheel.
-* Closing either graphical user interface or MyTourbook window will close tile server too.
+* After selecting task(s), map(s), theme file, theme style, style's overlays etc. in graphical user interface, hit _Start_ button to start Mapsforge tile server. After MyTourbook has started successfully, activate MyTourbook's map _MapsforgeMap_ to show map(s) and/or _MapsforgeHillshading to show hillshading selected in graphical user interface. When changing settings while MyTourbook is running, a reload of maps is required to adopt new settings. To reload, first hit _Start_ button again and MyTourbook's tile cache containing tiles already loaded with previous settings gets cleared.  Second, right-click MyTourbook's 2D Tour Map and force MyTourbook to reload failed map images or by zooming in and out via mouse wheel.
+* Closing either graphical user interface or MyTourbook window will close Mapsforge tile server too.
 * Use keyboard keys Ctrl-plus to increase and keyboard keys Ctrl-minus to decrease font size of graphical user interface and/or output console.
-* See output console for tile server’s and MyTourbook's output.
+* See output console for Mapsforge tile server’s and MyTourbook's output.
 
 ### MyTourbook integration
 
 Import _2D Map_ map provider files with Drag&Drop or _Import_ button in the preference page for _2D Map_ map providers.  
 
-* File _mapsforgemap.xml_ defines _2D Map_ custom map provider _MapsforgeMap_ fetching map tiles from tile server.
-* File _mapsforgehillshading.xml_ defines _2D Map_ custom map provider _MapsforgeHillshading_ fetching alpha-transparent hillshading tiles from tile server if selected in graphical user interface.
+* File _mapsforgemap.xml_ defines _2D Map_ custom map provider _MapsforgeMap_ fetching map tiles from Mapsforge tile server.
+* File _mapsforgehillshading.xml_ defines _2D Map_ custom map provider _MapsforgeHillshading_ fetching alpha-transparent hillshading tiles from Mapsforge tile server if selected in graphical user interface.
 * File _mapsforgemaphillshading.xml_ defines _2D Map_ map profile _MapsforgeMapHillshading_ which composes Mapsforge server's map tiles with Mapsforge server's alpha-transparent hillshading.
 
 Edit imported map providers and make sure that port number(s) in MyTourbook’s _Custom Url_ match port number(s) defined in Mapsforge-for-MyTourbook graphical user interface server configuration's _TCP port(s)_.
@@ -140,7 +141,7 @@ Screenshot of MyTourbook showing Heidelberg (Germany), comparing _2D Tour Map_ a
 ### Hints
 
 * Output console  
-While console output of tile server and/or MyTourbook can be informative and helpful to verify what is happening as well as to analyze errors, writing to console costs some performance. Therefore the console should be hidden if not needed.
+While console output of Mapsforge tile server and/or MyTourbook can be informative and helpful to verify what is happening as well as to analyze errors, writing to console costs some performance. Therefore the console should be hidden if not needed.
 * Built-in world map  
 Since the built-in [Mapsforge world map](https://download.mapsforge.org/maps/world/world.map) only shows the coastline, it only serves as a rough overview. Due to map's low resolution, coastlines show inaccurate at high resolution.  
 In order not to cover an accurate map, the built-in world map has been automatically deactivated at higher zoom levels.    

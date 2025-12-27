@@ -25,7 +25,7 @@ if {[encoding system] != "utf-8"} {
 if {![info exists tk_version]} {package require Tk}
 wm withdraw .
 
-set version "2025-11-01"
+set version "2025-12-27"
 set script [file normalize [info script]]
 set title [file tail $script]
 
@@ -728,16 +728,20 @@ pack .f
 
 # Server task(s)
 
-set task.active (default)
-set task.name ${task.active}
+set task.pattern "^\[0-9A-Za-z\]+(\[_.+-\]?\[0-9A-Za-z\]+)*$"
+set task.active ""
+set task.name ""
 
-lappend task.set (default)
+lappend task.set ""
 foreach task [glob -nocomplain -path $ini_folder/ \
-	-type f -tails task.*.ini] \
-	{lappend task.set [regsub {^task.(.*).ini$} $task {\1}]}
+	-type f -tails task.*.ini] {
+  set task [regsub {^task.(.*).ini$} $task {\1}]
+  if {![regexp ${task.pattern} $task]} continue
+  lappend task.set $task
+}
 set task.set [lsort -unique ${task.set}]
 
-lappend task.use (default)
+lappend task.use ""
 set task.use [lmap task ${task.set} \
 	{if {$task ni ${task.use}} continue;set task}]
 
@@ -872,7 +876,7 @@ proc task_item_toggle {} {
   set lb .task_list.listbox
   set i [$lb index active]
   set v [$lb get $i]
-  if {$v == "(default)"} return
+  if {$v == ""} return
   if {$i in [$lb curselection]} {
     $lb selection clear $i
     if {[process_running srv]} {srv_task_delete $v}
@@ -887,7 +891,7 @@ proc task_item_delete {} {
   set sb .task_list.scrollbar
   set i [$lb index active]
   set v [$lb get $i]
-  if {$v == "(default)"} return
+  if {$v == ""} return
   $lb delete $i
   set ::task.set [lreplace ${::task.set} $i $i]
   set len [llength ${::task.set}]
@@ -910,7 +914,7 @@ proc task_item_add {} {
     save_task_settings ${::task.active}
     set ::task.active $v
     restore_task_settings ${::task.active}
-  } elseif {[regexp "^\[0-9A-Za-z\]+(\[_.+-\]?\[0-9A-Za-z\]+)*$" $v]} {
+  } elseif {[regexp ${::task.pattern} $v]} {
     save_task_settings ${::task.active}
     set ::task.active $v
     set ::task.set [lsort [lappend ::task.set $v]]
@@ -1709,6 +1713,7 @@ proc get_element_attributes {name string} {
 proc find_overlays_for_layer {layer_id layers} {
   set overlays {}
   set layer_index [lsearch -exact -index 0 $layers $layer_id]
+  if {$layer_index < 0} {return $overlays}
   array set layer [lindex $layers [list $layer_index 1]]
   if {[info exists layer(parent)]} \
 	{lappend overlays {*}[find_overlays_for_layer $layer(parent) $layers]}
@@ -1860,6 +1865,7 @@ proc update_theme_styles_overlays {} {
     set overlays {}
     foreach overlay_id [find_overlays_for_layer $layer(id) $layers] {
       set overlay_index [lsearch -exact -index 0 $layers $overlay_id]
+      if {$overlay_index < 0} continue
       array unset overlay_layer
       array set overlay_layer [lindex $layers [list $overlay_index 1]]
       if {![info exists overlay_layer(enabled)]} \
@@ -2358,8 +2364,7 @@ proc srv_task_create {task} {
   # Configure subtasks
 
   foreach subtask {Map Hillshading} {
-
-    set name [regsub ".(.default)." $subtask.$task ""]
+    set name [string trimright $subtask.$task .]
     set file $::tmpdir/tasks/$name.properties
 
     set params {}
@@ -2442,7 +2447,7 @@ proc srv_task_create {task} {
 
 proc srv_task_delete {task} {
   foreach subtask {Map Hillshading} {
-    set name [regsub ".(.default)." $subtask.$task ""]
+    set name [string trimright $subtask.$task .]
     clean_mapsforge
     set file $::tmpdir/tasks/$name.properties
     file delete $file
@@ -2758,7 +2763,7 @@ while {1} {
   vwait action
   if {$action == 0} {
     save_task_settings ${task.active}
-    restore_task_settings (default)
+    restore_task_settings ""
     foreach item {global theme shading mytourbook} {save_${item}_settings}
     exit
   }
@@ -2864,7 +2869,7 @@ wm withdraw .
 # Save settings to folder ini_folder
 
 save_task_settings ${task.active}
-restore_task_settings (default)
+restore_task_settings ""
 foreach item {global theme shading mytourbook} {save_${item}_settings}
 
 # Wait until output console window was closed
