@@ -22,7 +22,7 @@ Screenshot of graphical user interface:
 ### Installation
 
 1.	**MyTourbook**  
-If not yet installed, download and install latest MyTourbook version from [download section](https://mytourbook.sourceforge.io/mytourbook/index.php/download-install).  
+If not yet installed, download and install latest MyTourbook version from [Github](https://github.com/mytourbook/mytourbook/releases).  
 **Note**: Run MyTourbook at least once to initialize program's settings.  
 
 2.	**Java runtime environment (JRE) or Java development kit (JDK)**  

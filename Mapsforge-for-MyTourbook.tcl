@@ -25,7 +25,7 @@ if {[encoding system] != "utf-8"} {
 package require Tk
 wm withdraw .
 
-set version "2026-01-11"
+set version "2026-01-28"
 set script [file normalize [info script]]
 set title [file tail $script]
 
@@ -2163,11 +2163,11 @@ proc clean_mapsforge {} {
   if {![info exists ::tcp.addresses]} return
 
   # MyTourbook's configuration & plugins folder
-  set config $::env(HOME)
+  set config [file normalize $::env(HOME)]
   switch $::tcl_platform(os) {
     "Windows NT" {append config /mytourbook}
-    "Linux"	 -
-    "Darwin"	 {append config /.mytourbook}
+    "Linux"	 {append config /.mytourbook}
+    "Darwin"	 {append config /mytourbook}
   }
   set plugins $config/.metadata/.plugins
 
@@ -2629,16 +2629,19 @@ proc mtb_start {} {
     lappend ::mtb_args -Dswt.autoScale=[set ::mtb.scale.${::mtb.scale}]
   }
 
+  lappend command $::mtb_cmd
   # Override and append MyTourbook's launcher ini file
-  set mtb_dir [file dirname $::mtb_cmd]
   set mtb_ini [file rootname [file tail $::mtb_cmd]].ini
-  set fdi [open $mtb_dir/$mtb_ini]
-  set fdo [open $::tmpdir/$mtb_ini w]
-  fcopy $fdi $fdo
-  close $fdi
-  foreach item ${::mtb_args} {puts $fdo $item}
-  close $fdo
-  lappend command $::mtb_cmd --launcher.ini "$::tmpdir/$mtb_ini"
+  set mtb_dir [file dirname $::mtb_cmd]
+  if {$::tcl_platform(os) == "Darwin"} {regsub MacOS $mtb_dir Eclipse mtb_dir}
+  if {![catch {open $mtb_dir/$mtb_ini} fdi]} {
+    set fdo [open $::tmpdir/$mtb_ini w]
+    fcopy $fdi $fdo
+    close $fdi
+    foreach item ${::mtb_args} {puts $fdo $item}
+    close $fdo
+    lappend command --launcher.ini "$::tmpdir/$mtb_ini"
+  }
   if {$::iso_639_1 != "en"} {lappend command -nl $::locale}
 
   set name "MyTourbook \[MTB\]"
@@ -2653,8 +2656,8 @@ proc mtb_start {} {
   }
 }
 
-# Stop MyTourbook by closing its desktop window(s)
-# and give process a chance to terminate itself gracefully
+# Request the application to terminate
+# Give it a chance to terminate gracefully
 # before being killed forcibly
 
 proc mtb_stop {} {
@@ -2663,32 +2666,20 @@ proc mtb_stop {} {
   if {![namespace exists $process]} return
   namespace upvar $process pid pid exe exe
 
-  cputi "[mc m56 $pid $exe] ..."
-
-  set window_ids {}
   if {$::tcl_platform(os) == "Windows NT"} {
-    # Search main desktop window of process
-    set tmp $::tmpdir/tmp
-    set fd [open $tmp.ps1 w]
-    puts $fd "\$PROCESS = Get-Process -id $pid"
-    puts $fd "\$PROCESS.MainWindowHandle | out-file -encoding ASCII \"$tmp.log\""
-    close $fd
-    set rc [catch {exec cmd.exe /C START /MIN powershell.exe \
-	-NoProfile -ExecutionPolicy ByPass -File "$tmp.ps1"} result]
-    file delete $tmp.ps1
-    if {$rc} {cputw "PowerShell ended abnormally"; cputw "$result"}
-    set rc [catch {open $tmp.log r} fd]
-    if {$rc == 0} {
-      set window_ids [read $fd]
-      close $fd
-    }
-    file delete $tmp.log
+
+    cputi [mc m58 $pid $exe]
+    catch {exec TASKKILL /PID $pid}
+
   } elseif {$::tcl_platform(os) == "Linux"} {
+
     if {[auto_execok wmctrl] == ""} {
       cputw "Please install program 'wmctrl' by package manager"
       cputw "to be able to close desktop windows of process '$exe'."
       return
     }
+    cputi "[mc m56 $pid $exe] ..."
+    set window_ids {}
     # Search desktop windows of process and children
     set rc [catch {exec pgrep -P $pid} list]
     if {$rc} {set list $pid} else {lappend list $pid}
@@ -2698,38 +2689,21 @@ proc mtb_stop {} {
       while {[gets $fd line] != -1} {lappend window_ids [lindex $line 0]}
       catch {close $fd}
     }
-  } elseif {$::tcl_platform(os) == "Darwin"} {
-    set window_ids x
-  }
-
-  if {![llength $window_ids]} {
-    cputi [mc m57 $pid $exe]
-    return
-  }
-
-  cputi [mc m58 $pid $exe]
-
-  if {$::tcl_platform(os) == "Windows NT"} {
-    # Send WM_CLOSE (0x0010) message to main desktop window
-    set fd [open $tmp.ps1 w]
-    puts $fd {$MemberDefinition = @"}
-    puts $fd {[DllImport("user32.dll")]}
-    puts $fd {public static extern IntPtr SendMessageTimeout(IntPtr hWnd,uint hMsg,IntPtr wParam,IntPtr lParam,uint fuFlags,uint uTimeout, IntPtr lpdwResult);}
-    puts $fd {"@}
-    puts $fd {Add-Type -MemberDefinition $MemberDefinition -Name Function -Namespace Win32Api}
-    puts $fd "\[Win32Api.Function\]::SendMessageTimeout($window_ids,0x0010,0,0,0,5000,0)"
-    close $fd
-    set rc [catch {exec cmd.exe /C START /MIN powershell.exe \
-	-NoProfile -ExecutionPolicy ByPass -File "$tmp.ps1"} result]
-    file delete $tmp.ps1
-    if {$rc} {cputw "PowerShell ended abnormally"; cputw "$result"; return}
-  } elseif {$::tcl_platform(os) == "Linux" || $::tcl_platform(os) == "Darwin"} {
+    if {![llength $window_ids]} {
+      cputi [mc m57 $pid $exe]
+      return
+    }
+    cputi [mc m58 $pid $exe]
     # Send WM_DELETE_WINDOW event to desktop window(s)
     foreach item $window_ids {catch {exec wmctrl -i -c $item}}
+
   } elseif {$::tcl_platform(os) == "Darwin"} {
+
+    cputi [mc m58 $pid $exe]
     # Send "quit" to application (AppleScript)
     set script "tell application \"MyTourbook\" to quit saving yes"
     catch {exec osascript -e $script}
+   
   }
 
   # Give process some time (max $count sec) to terminate itself
