@@ -25,7 +25,7 @@ if {[encoding system] != "utf-8"} {
 package require Tk
 wm withdraw .
 
-set version "2026-01-28"
+set version "2026-02-02"
 set script [file normalize [info script]]
 set title [file tail $script]
 
@@ -440,96 +440,95 @@ wm protocol . WM_DELETE_WINDOW "set action 0"
 wm resizable . 0 0
 . configure -bd 5 -bg $colorBackground
 
-# Output console window
+# Output console window (".console" issue!)
 
 set console 0;			# Valid values: 0=hide, 1=show
 
-toplevel .console
-wm withdraw .console
-wm title .console "$title - [mc l99]"
-ttk::style configure .console -border $colorBorder -troughcolor $colorTrough
+toplevel .konsole
+wm withdraw .konsole
+wm title .konsole "$title - [mc l99]"
 
 set family [font configure TkFixedFont -family]
-foreach item {Consolas "Ubuntu Mono" "Noto Mono" "Liberation Mono" \
-	"SF Mono"} {
+foreach item {Consolas "Ubuntu Mono" "Noto Mono" "Liberation Mono" "SF Mono"} {
   if {$item ni [font families]} continue
   set family $item
   break
 }
 font create console_font -family $family -size ${console.font.size}
 
-text .console.txt -font console_font -wrap none -setgrid 1 \
+text .konsole.txt -font console_font -wrap none -setgrid 1 \
 	-state disabled -undo 0 -bg white \
-	-width 120 -xscrollcommand {.console.sbx set} \
-	-height 24 -yscrollcommand {.console.sby set}
-ttk::scrollbar .console.sbx -orient horizontal -command {.console.txt xview}
-ttk::scrollbar .console.sby -orient vertical   -command {.console.txt yview}
-grid .console.txt -row 1 -column 1 -sticky nswe
-grid .console.sby -row 1 -column 2 -sticky ns
-grid .console.sbx -row 2 -column 1 -sticky we
-grid columnconfigure .console 1 -weight 1
-grid rowconfigure    .console 1 -weight 1
+	-width 120 -xscrollcommand {.konsole.sbx set} \
+	-height 24 -yscrollcommand {.konsole.sby set}
+scrollbar .konsole.sbx -orient horizontal -command {.konsole.txt xview}
+scrollbar .konsole.sby -orient vertical   -command {.konsole.txt yview}
+grid .konsole.txt -row 1 -column 1 -sticky nswe
+grid .konsole.sby -row 1 -column 2 -sticky ns
+grid .konsole.sbx -row 2 -column 1 -sticky we
+grid columnconfigure .konsole 1 -weight 1
+grid rowconfigure    .konsole 1 -weight 1
+update idletasks
 
 if {${console.geometry} != ""} {
   lassign ${console.geometry} x y cols rows
-  if {$x > [expr [winfo vrootx .console]+[winfo vrootwidth .console]] ||
-      $x < [winfo vrootx .console]} {set x [winfo vrootx .console]}
-  wm positionfrom .console program
-  catch "wm geometry .console ${cols}x${rows}+$x+$y"
+  if {$x > [expr [winfo vrootx .konsole]+[winfo vrootwidth .konsole]] ||
+      $x < [winfo vrootx .konsole]} {set x [winfo vrootx .konsole]}
+  wm positionfrom .konsole program
+  catch "wm geometry .konsole ${cols}x${rows}+$x+$y"
 }
 
-bind .console.txt <Control-a> {%W tag add sel 1.0 end;break}
-bind .console.txt <Control-c> {tk_textCopy %W;break}
-bind .console <Control-plus>  {console_font_size_incr +1}
-bind .console <Control-minus> {console_font_size_incr -1}
-bind .console <Control-KP_Add>      {console_font_size_incr +1}
-bind .console <Control-KP_Subtract> {console_font_size_incr -1}
+bind .konsole.txt <Control-a> {%W tag add sel 1.0 end;break}
+bind .konsole.txt <Control-c> {tk_textCopy %W;break}
+bind .konsole <Control-plus>  {console_font_size_incr +1}
+bind .konsole <Control-minus> {console_font_size_incr -1}
+bind .konsole <Control-KP_Add>      {console_font_size_incr +1}
+bind .konsole <Control-KP_Subtract> {console_font_size_incr -1}
 
-bind .console <Configure> {
-  if {"%W" != ".console"} continue
+bind .konsole <Configure> {
+  if {"%W" != ".konsole"} continue
   scan [wm geometry %W] "%%dx%%d+%%d+%%d" cols rows x y
   set console.geometry "$x $y $cols $rows"
 }
 
 proc console_font_size_incr {incr} {
-  set px [.console.txt xview]
-  set py [.console.txt yview]
+  set px [.konsole.txt xview]
+  set py [.konsole.txt yview]
   set size [font configure console_font -size]
   incr size $incr
   if {$size < 5 || $size > 20} return
   font configure console_font -size $size
   set ::console.font.size $size
   update idletasks
-  .console.txt xview moveto [lindex $px 0]
-  .console.txt yview moveto [lindex $py 0]
+  .konsole.txt xview moveto [lindex $px 0]
+  .konsole.txt yview moveto [lindex $py 0]
 }
 
 proc console_write {text} {
-  .console.txt configure -state normal
+  .konsole.txt configure -state normal
   foreach item [split $text \n] {
     if {[string index $item 0] == "\r"} {
 	set item [string range $item 1 end]
-	.console.txt delete end-2l end-1l
+	.konsole.txt delete end-2l end-1l
     }
     if {[string index $item end] == "\b"} {
 	set item [string range $item 0 end-1]
     } else {
 	append item \n
     }
-    .console.txt insert end $item
+    .konsole.txt insert end $item
   }
-  .console.txt configure -state disabled
-  if {[winfo ismapped .console]} {.console.txt see end}
+  .konsole.txt configure -state disabled
+  if {[winfo ismapped .konsole]} {.konsole.txt see end}
 }
 
 proc console_show_hide {show} {
   if {$show} {
-    .console.txt see end
-    wm attributes .console -topmost 1
-    wm deiconify .console
-    wm attributes .console -topmost 0
+    .konsole.txt see end
+    wm attributes .konsole -topmost 1
+    wm deiconify .konsole
+    wm attributes .konsole -topmost 0
   } else {
-    wm withdraw .console
+    wm withdraw .konsole
   }
 }
 
@@ -1113,11 +1112,11 @@ checkbutton .output -text [mc c99] \
 pack .output -expand 1 -fill x
 console_show_hide ${console.show}
 
-wm protocol .console WM_DELETE_WINDOW {.output invoke}
-bind .console <Double-ButtonRelease-3> {.output invoke}
+wm protocol .konsole WM_DELETE_WINDOW {.output invoke}
+bind .konsole <Double-ButtonRelease-3> {.output invoke}
 # Map/Unmap events are generated by Windows only!
-bind .console <Unmap> {if {"%W" == ".console"} {set console.show 0}}
-bind .console <Map>   {if {"%W" == ".console"} {set console.show 1}}
+bind .konsole <Unmap> {if {"%W" == ".konsole"} {set console.show 0}}
+bind .konsole <Map>   {if {"%W" == ".konsole"} {set console.show 1}}
 
 # --- End of main window
 
@@ -2165,17 +2164,16 @@ proc clean_mapsforge {} {
   # MyTourbook's configuration & plugins folder
   set config [file normalize $::env(HOME)]
   switch $::tcl_platform(os) {
+    "Darwin"	 -
     "Windows NT" {append config /mytourbook}
     "Linux"	 {append config /.mytourbook}
-    "Darwin"	 {append config /mytourbook}
   }
   set plugins $config/.metadata/.plugins
 
   # Get MyTourbook's offline cache path
   set OffLineCache_Path $config
   set file $plugins/org.eclipse.core.runtime/.settings/net.tourbook.prefs
-  set rc [catch {open $file r} fd]
-  if {!$rc} {
+  if {![catch {open $file r} fd]} {
     set data [split [read $fd] \n]
     close $fd
     foreach item {OffLineCache_Path} {
@@ -2191,8 +2189,7 @@ proc clean_mapsforge {} {
   # Get MyTourbook's maps offline folders
   set cache_folder {}
   set file $plugins/net.tourbook/custom-map-provider.xml
-  set rc [catch {open $file r} fd]
-  if {!$rc} {
+  if {![catch {open $file r} fd]} {
     set data [split [read $fd] \n]
     close $fd
     set data [regexp -all -inline {(?:<MapProvider )(.*?)(?:>)(?:.*?)(?:</MapProvider>)} $data]
@@ -2256,9 +2253,7 @@ proc process_start {command process} {
 
   proc tsend {script} "return \[thread::send $tid \$script\]"
 
-  set rc [tsend {catch {open "| $command 2>@1" r} fd}]
-
-  if {$rc} {
+  if {[tsend {catch {open "| $command 2>@1" r} fd}]} {
     set result [tsend "set fd"]
     thread::release $tid
     error_message $result return
@@ -2315,9 +2310,8 @@ proc process_kill {process} {
   if {$::tcl_platform(os) == "Windows NT"} {
     catch {exec TASKKILL /F /PID $pid /T}
   } elseif {$::tcl_platform(os) == "Linux" || $::tcl_platform(os) == "Darwin"} {
-    set rc [catch {exec pgrep -P $pid} list]
-    if {$rc} {set list $pid} else {lappend list $pid}
-    foreach item $list {catch {exec kill -SIGTERM $item}}
+    if {[catch {exec pgrep -d " " -P $pid} list]} {set list {}}
+    catch {exec kill -SIGKILL $pid {*}$list}
   }
 
   if {![info exist ::$process.eof]} {
@@ -2679,13 +2673,11 @@ proc mtb_stop {} {
       return
     }
     cputi "[mc m56 $pid $exe] ..."
-    set window_ids {}
     # Search desktop windows of process and children
-    set rc [catch {exec pgrep -P $pid} list]
-    if {$rc} {set list $pid} else {lappend list $pid}
-    foreach item $list {
-      set rc [catch {open "| wmctrl -l -p | grep \" $item \"" r} fd]
-      if {$rc != 0} continue
+    set window_ids {}
+    if {[catch {exec pgrep -d " " -P $pid} list]} {set list {}}
+    foreach item "$pid $list" {
+      if {[catch {open "| wmctrl -l -p | grep \" $item \"" r} fd]} continue
       while {[gets $fd line] != -1} {lappend window_ids [lindex $line 0]}
       catch {close $fd}
     }
@@ -2756,20 +2748,18 @@ if {$tcl_platform(os) == "Windows NT"} {
   set result [split $result ,]
   if {[llength $result] == 5} {
     eval set pid [lindex $result 1]
-    set rc [messagebox -title $title -type yesno -default no -icon question \
-	-message [mc e01 MyTourbook $exe $pid] -detail [mc e02]]
-    if {$rc == "no"} exit
+    if {[messagebox -title $title -type yesno -default no -icon question \
+	-message [mc e01 MyTourbook $exe $pid] -detail [mc e02]] == "no"} exit
     catch {exec TASKKILL /F /PID $pid /T}
   }
 } elseif {$tcl_platform(os) == "Linux" || $tcl_platform(os) == "Darwin"} {
   set exe [file tail $mtb_cmd]
-  set rc [catch {exec pgrep -n -u $tcl_platform(user) $exe} result]
-  if {$rc == 0} {
+  if {![catch {exec pgrep -n -u $tcl_platform(user) $exe} result]} {
     set pid $result
-    set rc [messagebox -title $title -type yesno -default no -icon question \
-	-message [mc e01 MyTourbook $exe $pid] -detail [mc e02]]
-    if {$rc == "no"} exit
-    catch {exec kill -SIGTERM $pid}
+    if {[messagebox -title $title -type yesno -default no -icon question \
+	-message [mc e01 MyTourbook $exe $pid] -detail [mc e02]] == "no"} exit
+    if {[catch {exec pgrep -d " " -P $pid} list]} {set list {}}
+    catch {exec kill -SIGKILL $pid {*}$list}
   }
 }
 
@@ -2844,11 +2834,11 @@ wm withdraw .
 
 # Wait until output console window was closed
 
-if {[winfo ismapped .console]} {
+if {[winfo ismapped .konsole]} {
   console_write "\n[mc m99]\b"
-  wm protocol .console WM_DELETE_WINDOW {}
-  bind .console <ButtonRelease-3> {destroy .console}
-  tkwait window .console
+  wm protocol .konsole WM_DELETE_WINDOW {}
+  bind .konsole <ButtonRelease-3> {destroy .konsole}
+  tkwait window .konsole
 }
 
 # Save settings to folder ini_folder
